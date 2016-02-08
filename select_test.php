@@ -1,5 +1,7 @@
 <?php
 
+//updated by team member
+
 $hostname = "mysql.czrx0p0th7zk.us-west-2.rds.amazonaws.com:3306";
 $username = "dbmaster";
 $password = "Rltxjf11";
