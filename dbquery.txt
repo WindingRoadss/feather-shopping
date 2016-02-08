@@ -1,0 +1,19 @@
+CREATE TABLE TB_MEMBER (
+
+MB_USID varchar(20) not null,
+MB_PSWD varchar(20) not null,
+MB_NAME varchar(20) not null,
+MB_BIRTH date default '0000-00-00',
+MB_SEX varchar(5),
+MB_ADDR varchar(30),
+MB_PHNUM varchar(20),
+primary key(MB_USID)
+) ENGINE=INNODB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE TB_DELIVERY (
+DL_NUM int NOT NULL auto_increment,
+DL_DATE DATETIME DEFAULT '0000-00-00 00:00:00',
+DL_USID varchar(20) not null,
+primary key(DL_NUM),
+FOREIGN KEY (DL_USID) REFERENCES TB_MEMBER(MB_USID) ON UPDATE CASCADE ON DELETE CASCADE,
+) ENGINE=INNODB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
