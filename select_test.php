@@ -16,7 +16,10 @@ while($row=mysql_fetch_assoc($result)){
     echo("<br />\n");
     echo($row['pwd']);
     echo("<br />\n");
+    echo("<br />\n");
 }
+
+//주석 추가
 
 mysql_free_result($result);
 mysql_close($connect);
