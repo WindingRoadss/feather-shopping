@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hwc.kart.KartActivity;
+
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
@@ -23,6 +25,7 @@ public class MainActivity extends Activity {
     public EditText et_id;
     public EditText et_password;
     public Button bt_enter;
+    public Button bt_karttemp;
     private String id, password;
     private ArrayList<String> arrayMemberIdName; //회원의 ID와 이름 저장
     private boolean mChecked = false;
@@ -59,6 +62,15 @@ public class MainActivity extends Activity {
                     mProgress.dismiss();
                 } else
                     Toast.makeText(getBaseContext(), "네트워크 연결 상태를 확인하세요", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        bt_karttemp = (Button) findViewById(R.id.bt_karttemp);
+        bt_karttemp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), KartActivity.class);
+                startActivity(intent);
             }
         });
     }

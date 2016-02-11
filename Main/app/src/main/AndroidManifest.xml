@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hwc.main">
 
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -22,8 +22,9 @@
         </activity>
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".SelectActivity"></activity>
-        <activity android:name=".NFCActivity"></activity>
+        <activity android:name=".SelectActivity" />
+        <activity android:name="com.hwc.kart.KartActivity" />
+        <activity android:name="com.hwc.kart.custom_list"></activity>
     </application>
 
 </manifest>
