@@ -23,6 +23,7 @@
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SelectActivity"></activity>
+        <activity android:name=".NFCActivity"></activity>
     </application>
 
 </manifest>
