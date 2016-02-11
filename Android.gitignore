@@ -13,6 +13,9 @@ gen/
 .gradle/
 build/
 
+# Idea
+*.idea/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
