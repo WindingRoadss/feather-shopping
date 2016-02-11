@@ -1,5 +1,5 @@
 <?php
-
+//변경
 include "common.php";  // Works.
 
 $id = $_REQUEST[id];
