@@ -23,6 +23,7 @@
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SelectActivity" />
+        <activity android:name=".NFCActivity" />
         <activity android:name="com.hwc.kart.KartActivity" />
         <activity android:name="com.hwc.kart.custom_list"></activity>
     </application>
