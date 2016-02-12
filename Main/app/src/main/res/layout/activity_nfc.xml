@@ -22,4 +22,130 @@
         android:id="@+id/tvTagId"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="test result"
+        android:id="@+id/tvTestResult"
+        android:layout_below="@+id/tvTagId"
+        android:layout_centerHorizontal="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinBrand"
+        android:layout_below="@+id/tvTestResult"
+        android:spinnerMode="dropdown"
+        android:layout_alignLeft="@+id/tvTestResult"
+        android:layout_alignStart="@+id/tvTestResult" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="brand"
+        android:id="@+id/tvBrand"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/spinBrand" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinProductName"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/spinBrand"
+        android:layout_alignLeft="@+id/spinBrand"
+        android:layout_alignStart="@+id/spinBrand" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinSerial"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/spinProductName"
+        android:layout_alignLeft="@+id/spinProductName"
+        android:layout_alignStart="@+id/spinProductName" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinSize"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/spinSerial"
+        android:layout_alignLeft="@+id/spinSerial"
+        android:layout_alignStart="@+id/spinSerial" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinColor"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/spinSize"
+        android:layout_alignLeft="@+id/spinSize"
+        android:layout_alignStart="@+id/spinSize" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="name"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/spinSerial"
+        android:layout_toLeftOf="@+id/spinProductName"
+        android:layout_toStartOf="@+id/spinProductName" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="serial"
+        android:id="@+id/textView3"
+        android:layout_above="@+id/spinSize"
+        android:layout_toLeftOf="@+id/spinSerial"
+        android:layout_toStartOf="@+id/spinSerial" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="size"
+        android:id="@+id/textView4"
+        android:layout_alignBottom="@+id/spinSize"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="color"
+        android:id="@+id/tvColor"
+        android:layout_alignBottom="@+id/spinColor"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="가격 : "
+        android:id="@+id/tvPrice"
+        android:layout_below="@+id/tvColor"
+        android:layout_alignLeft="@+id/tvColor"
+        android:layout_alignStart="@+id/tvColor" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="재고 : "
+        android:id="@+id/tvStock"
+        android:layout_below="@+id/tvPrice"
+        android:layout_alignLeft="@+id/tvPrice"
+        android:layout_alignStart="@+id/tvPrice" />
+
+
 </RelativeLayout>

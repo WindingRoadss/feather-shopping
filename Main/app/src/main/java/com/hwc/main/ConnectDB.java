@@ -262,7 +262,6 @@ public class ConnectDB {
         ArrayList<String> result = getResult(response, tags);
         return result;
     }
-
     public static ArrayList<String> getIsReservedIngHpt(String id, String year, String month,
                                                         String day) throws ClientProtocolException, IOException {
         HttpPost request = makeHttpPost("id", id, "year", year, "month", month, "day", day,
