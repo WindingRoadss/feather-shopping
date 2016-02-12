@@ -28,6 +28,7 @@ public class NFCActivity extends Activity {
 
     //EditText url;           // url 입력 받는 부분
     //EditText aar;           // AAR 입력 받는 부분
+    /* branch test */
     private String url;
     private String aar;
 
