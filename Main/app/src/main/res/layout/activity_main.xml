@@ -21,6 +21,7 @@
             android:layout_marginTop="10dp"
             android:background="@null"
             android:hint="아이디"
+            android:text="dbmaster"
             android:lines="1"
             android:singleLine="true"
             android:typeface="sans" />
@@ -34,6 +35,7 @@
             android:background="@null"
             android:ems="10"
             android:hint="패스워드"
+            android:text="Rltxjf11"
             android:inputType="textPassword"
             android:lines="1"
             android:singleLine="true"
