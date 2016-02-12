@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
-*/
+        */
     }
 
     class ThreadLogin extends Thread {
