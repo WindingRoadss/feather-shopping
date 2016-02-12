@@ -24,6 +24,7 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Light.NoTitleBar">
+        <!--
         <activity android:name="com.hwc.splash.Splash_MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,8 +32,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.hwc.splash.Splash_BlackActivity" />
+        -->
+        <!--
         <activity android:name=".MainActivity" />
+        -->
+
+        <activity android:name="com.hwc.main.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.hwc.splash.Splash_BlackActivity" />
+
         <activity android:name=".SelectActivity" />
         <activity android:name=".NFCActivity" />
         <activity android:name="com.hwc.kart.KartActivity" />

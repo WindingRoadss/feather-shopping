@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.hwc.kart.KartActivity;
+
 public class SelectActivity extends Activity {
 
     @Override
@@ -19,6 +21,15 @@ public class SelectActivity extends Activity {
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 Intent intent = new Intent(SelectActivity.this, NFCActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button btnCartInfo = (Button) findViewById(R.id.btnCart);
+        btnCartInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), KartActivity.class);
                 startActivity(intent);
             }
         });
