@@ -14,8 +14,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.hwc.cart.CartActivity;
-
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
@@ -65,6 +63,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        /*
         bt_karttemp = (Button) findViewById(R.id.bt_karttemp);
         bt_karttemp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +72,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+*/
     }
 
     class ThreadLogin extends Thread {
