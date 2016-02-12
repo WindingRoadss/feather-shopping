@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.hwc.kart.KartActivity;
+import com.hwc.cart.CartActivity;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
         bt_karttemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), KartActivity.class);
+                Intent intent = new Intent(getBaseContext(), CartActivity.class);
                 startActivity(intent);
             }
         });
@@ -102,7 +102,6 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
             mChecked = true;
-
         }
     }
 

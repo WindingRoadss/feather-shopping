@@ -1,4 +1,4 @@
-package com.hwc.kart;
+package com.hwc.cart;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -26,7 +26,7 @@ import java.util.HashMap;
  imageView.setImageBitmap(bmp);
  */
 
-public class KartActivity extends Activity {
+public class CartActivity extends Activity {
 
     String myJSON;
 
@@ -46,7 +46,7 @@ public class KartActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_kart);
+        setContentView(R.layout.activity_cart);
         list = (ListView) findViewById(R.id.listView);
         personList = new ArrayList<HashMap<String, String>>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php");
@@ -74,7 +74,7 @@ public class KartActivity extends Activity {
             }
 
             ListAdapter adapter = new SimpleAdapter(
-                    KartActivity.this, personList, R.layout.list_item,
+                    CartActivity.this, personList, R.layout.list_item,
                     new String[]{TAG_SIZE, TAG_NAME, TAG_BRAND},
                     new int[]{R.id.id, R.id.name, R.id.brand}
             );

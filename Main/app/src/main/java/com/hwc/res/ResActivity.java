@@ -1,15 +1,15 @@
-package com.hwc.kart;
+package com.hwc.res;
 
 import android.app.Activity;
 import android.os.Bundle;
 
 import com.hwc.main.R;
 
-public class custom_list extends Activity {
+public class ResActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_item);
+        setContentView(R.layout.activity_res);
     }
 }
