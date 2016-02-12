@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        /*
         bt_karttemp = (Button) findViewById(R.id.bt_karttemp);
         bt_karttemp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +74,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+        */
     }
 
     class ThreadLogin extends Thread {
