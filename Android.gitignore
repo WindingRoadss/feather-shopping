@@ -9,10 +9,6 @@
 bin/
 gen/
 
-# Gradle files
-.gradle/
-build/
-
 # Idea
 *.idea/
 

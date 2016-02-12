@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hwc.main">
 
+    <!-- NFC와 Webview를 위한 permission 선언-->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,6 +18,7 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Light.NoTitleBar">
+        <!--
         <activity android:name="com.hwc.splash.Splash_MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,13 +26,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.hwc.splash.Splash_BlackActivity" />
+        -->
+        <!--
         <activity android:name=".MainActivity" />
-        <activity android:name=".SelectActivity" />
-        <activity android:name="com.hwc.cart.CartActivity" />
-        <activity android:name="com.hwc.cart.custom_list" />
-        <activity android:name="com.hwc.res.ResActivity" />
-        <activity android:name="com.hwc.res.custom_res"></activity>
-    </application>
+        -->
 
+        <activity android:name="com.hwc.main.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.hwc.splash.Splash_BlackActivity" />
+        <activity android:name=".SelectActivity" />
+        <activity android:name=".NFCActivity" />
+        <activity android:name="com.hwc.cart.custom_list" />
+        <activity android:name="com.hwc.cart.CartActivity" />
+        <activity android:name="com.hwc.res.ResActivity" />
+        <activity android:name="com.hwc.res.custom_res" />
+    </application>
 </manifest>
