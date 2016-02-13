@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,25 +28,26 @@ import java.util.ArrayList;
 
 public class CartActivity extends Activity {
     public ListView_custom adapter;
-    private String myJSON;
+    public String myJSON;
 
     public static final String HWC = "HWC";
-    private static final String TAG_RESULTS = "result";
-    // private static final String TAG_SNUM = "PR_SNUM";
-    private static final String TAG_COLOR = "PR_COLOR";
-    private static final String TAG_SIZE = "PR_SIZE";
-    private static final String TAG_NAME = "PR_NAME";
-    private static final String TAG_BRAND = "PR_BRAND";
-    //private static final String TAG_IMAGE = "PR_IMAGE";
-    private ArrayList<String> data_name = new ArrayList<>();
-    private ArrayList<String> data_size = new ArrayList<>();
-    private ArrayList<String> data_color = new ArrayList<>();
-    private ArrayList<String> data_brand = new ArrayList<>();
+    public static final String TAG_RESULTS = "result";
+    // public static final String TAG_SNUM = "PR_SNUM";
+    public static final String TAG_COLOR = "PR_COLOR";
+    public static final String TAG_SIZE = "PR_SIZE";
+    public static final String TAG_NAME = "PR_NAME";
+    public static final String TAG_BRAND = "PR_BRAND";
+    public static final String TAG_IMAGE = "PR_IMAGE";
+    public ArrayList<String> data_name = new ArrayList<>();
+    public ArrayList<String> data_size = new ArrayList<>();
+    public ArrayList<String> data_color = new ArrayList<>();
+    public ArrayList<String> data_brand = new ArrayList<>();
+    public ArrayList<String> data_image = new ArrayList<>();
 
     public JSONArray cart = null;
-    private ListView list;
+    public ListView list;
 
-    private Button btnSend;
+    public Button btnSend;
     public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
     public Bitmap btp_test;
     public ImageView img_test;
@@ -64,7 +64,7 @@ public class CartActivity extends Activity {
 
     }
 
-    protected void showList() {
+    public void showList() {
         try {
             JSONObject jsonObj = new JSONObject(myJSON);
             cart = jsonObj.getJSONArray(TAG_RESULTS);
@@ -80,11 +80,12 @@ public class CartActivity extends Activity {
                 data_size.add(c.getString(TAG_SIZE));
                 data_color.add(c.getString(TAG_COLOR));
                 data_brand.add(c.getString(TAG_BRAND));
+                data_image.add(c.getString(TAG_IMAGE));
             }
-            Log.d(HWC, "data_name의 값 : " + data_name);
+            //Log.d(HWC, "data_image의 주소 : " + data_image);
 
-            for (int i = 0; i < data_name.size(); i++) {
-                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i));
+            for (int i = 0; i < cart.length(); i++) {
+                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i));
                 adapter.add(u);
             }
 
