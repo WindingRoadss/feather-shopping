@@ -1,14 +1,21 @@
 package com.hwc.cart;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hwc.main.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +34,10 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     private String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     private ArrayList<ListView_getset> mData;
+
+    public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
+    public Bitmap btp_test;
+    public ImageView img_test;
 
     public ListView_custom(Context context) {
         super();
@@ -82,7 +93,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_brand = (TextView) v.findViewById(R.id.txt_brand);
             //url_image = (TextView) v.findViewById(R.id.url_image);
             //btnSend = (Button) v.findViewById(R.id.bt_detail);
-            //img_test = (ImageView) v.findViewById(R.id.img_test);
+            img_test = (ImageView) v.findViewById(R.id.img_test);
 
         }
 
@@ -99,7 +110,20 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
+            imageThread it = new imageThread();
+            it.start();
 
+            try {
+                //  메인 스레드는 작업 스레드가 이미지 작업을 가져올 때까지
+                //  대기해야 하므로 작업스레드의 join() 메소드를 호출해서
+                //  메인 스레드가 작업 스레드가 종료될 까지 기다리도록 합니다.
+                it.join();
+                //  이제 작업 스레드에서 이미지를 불러오는 작업을 완료했기에
+                //  UI 작업을 할 수 있는 메인스레드에서 이미지뷰에 이미지를 지정합니다.
+                img_test.setImageBitmap(btp_test);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             //url_image.setText(lv_gst.getUserManager());
             //btnSend.setOnClickListener(this);
         }
@@ -122,5 +146,24 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
         }*/
+    }
+
+    class imageThread extends Thread
+    {
+        @Override
+        public void run()
+        {
+            try {
+                URL url = new URL(imgUrl); // URL 주소를 이용해서 URL 객체 생성
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true);
+                conn.connect();
+                InputStream is = conn.getInputStream();
+                btp_test = BitmapFactory.decodeStream(is);
+            } catch (IOException i) {
+                i.printStackTrace();
+            }
+        }
+
     }
 }

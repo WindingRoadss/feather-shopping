@@ -2,7 +2,6 @@ package com.hwc.cart;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Button;
@@ -16,7 +15,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -25,7 +23,7 @@ import java.util.ArrayList;
 /**
  * URL url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
  * Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
- * imageView.setImageBitmap(bmp);
+ * img_test.setImageBitmap(bmp);
  */
 
 public class CartActivity extends Activity {
@@ -61,7 +59,8 @@ public class CartActivity extends Activity {
 
         //cartList = new ArrayList<>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php");
-        getBitmap(imgUrl);
+
+
     }
 
     protected void showList() {
@@ -86,7 +85,6 @@ public class CartActivity extends Activity {
                 ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i));
                 adapter.add(u);
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -94,12 +92,9 @@ public class CartActivity extends Activity {
 
     public void getData(String url) {
         class GetDataJSON extends AsyncTask<String, Void, String> {
-
             @Override
             protected String doInBackground(String... params) {
-
                 String uri = params[0];
-
                 BufferedReader bufferedReader = null;
                 try {
                     URL url = new URL(uri);
@@ -118,8 +113,6 @@ public class CartActivity extends Activity {
                 } catch (Exception e) {
                     return null;
                 }
-
-
             }
 
             @Override
@@ -130,31 +123,5 @@ public class CartActivity extends Activity {
         }
         GetDataJSON g = new GetDataJSON();
         g.execute(url);
-    }
-
-
-    public Bitmap getBitmap(String url) {
-        URL imgUrl = null;
-        HttpURLConnection connection = null;
-        InputStream is = null;
-
-        Bitmap retBitmap = null;
-
-        try {
-            imgUrl = new URL(url);
-            connection = (HttpURLConnection) imgUrl.openConnection();
-            connection.setDoInput(true); //url로 input받는 flag 허용
-            connection.connect(); //연결
-            is = connection.getInputStream(); // get inputstream
-            retBitmap = BitmapFactory.decodeStream(is);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-            return retBitmap;
-        }
     }
 }

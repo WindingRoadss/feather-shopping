@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
-        */
+  */
     }
 
     class ThreadLogin extends Thread {
@@ -92,7 +92,6 @@ public class MainActivity extends Activity {
                     ConnectDB.setEmail(arrayMemberIdName.get(2));
                     Intent intent = new Intent(getBaseContext(), SelectActivity.class);
                     startActivity(intent);
-                    finish();
                 } else {
                     failedLogin();
                 }
