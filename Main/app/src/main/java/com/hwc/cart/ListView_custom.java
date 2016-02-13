@@ -3,6 +3,8 @@ package com.hwc.cart;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,14 @@ import android.widget.TextView;
 
 import com.hwc.main.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,9 +43,18 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     // 리스트 아이템 데이터를 저장할 배열
     private ArrayList<ListView_getset> mData;
 
-    public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
+    public String temp_imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
+    public String imgUrl = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php";
     public Bitmap btp_test;
     public ImageView img_test;
+
+    // .php에서 가져오는 이미지 주소 (JSON으로 반환)
+    public static final String HWC = "HWC";
+    private static final String TAG_IMAGE = "PR_IMAGE";
+    private static final String TAG_RESULTS = "result";
+    private ArrayList<String> data_image = new ArrayList<>();
+    private String myJSON;
+    private JSONArray cart = null;
 
     public ListView_custom(Context context) {
         super();
@@ -110,6 +127,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
+            getData();
             imageThread it = new imageThread();
             it.start();
 
@@ -148,13 +166,63 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         }*/
     }
 
-    class imageThread extends Thread
-    {
+    public void getData() {
+        class GetDataJSON extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params) {
+                String uri = params[0];
+                BufferedReader bufferedReader = null;
+                try {
+                    URL url = new URL(uri);
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    StringBuilder sb = new StringBuilder();
+
+                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                    String json;
+                    while ((json = bufferedReader.readLine()) != null) {
+                        sb.append(json + "\n");
+                    }
+
+                    return sb.toString().trim();
+
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                myJSON = result;
+                getJSONImageurl();
+            }
+        }
+        GetDataJSON g = new GetDataJSON();
+        g.execute(imgUrl);
+    }
+
+    public void getJSONImageurl() {
+        try {
+            JSONObject jsonObj = new JSONObject(myJSON);
+            cart = jsonObj.getJSONArray(TAG_RESULTS);
+
+            //*JSON 언어*//*
+            for (int i = 0; i < cart.length(); i++) {
+                JSONObject c = cart.getJSONObject(i);
+                data_image.add(c.getString(TAG_IMAGE));
+            }
+            Log.d(HWC, "data_image의 값 : " + data_image);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    class imageThread extends Thread {
         @Override
-        public void run()
-        {
+        public void run() {
             try {
-                URL url = new URL(imgUrl); // URL 주소를 이용해서 URL 객체 생성
+                URL url = new URL(temp_imgUrl); // URL 주소를 이용해서 URL 객체 생성
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
                 conn.connect();
@@ -164,6 +232,5 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
                 i.printStackTrace();
             }
         }
-
     }
 }

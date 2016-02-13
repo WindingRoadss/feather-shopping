@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 
 public class CartActivity extends Activity {
     public ListView_custom adapter;
-    public String myJSON;
+    private String myJSON;
 
     public static final String HWC = "HWC";
     private static final String TAG_RESULTS = "result";
@@ -37,11 +38,11 @@ public class CartActivity extends Activity {
     private static final String TAG_SIZE = "PR_SIZE";
     private static final String TAG_NAME = "PR_NAME";
     private static final String TAG_BRAND = "PR_BRAND";
-    private static final String TAG_IMAGE = "PR_IMAGE";
-    ArrayList<String> data_name = new ArrayList<>();
-    ArrayList<String> data_size = new ArrayList<>();
-    ArrayList<String> data_color = new ArrayList<>();
-    ArrayList<String> data_brand = new ArrayList<>();
+    //private static final String TAG_IMAGE = "PR_IMAGE";
+    private ArrayList<String> data_name = new ArrayList<>();
+    private ArrayList<String> data_size = new ArrayList<>();
+    private ArrayList<String> data_color = new ArrayList<>();
+    private ArrayList<String> data_brand = new ArrayList<>();
 
     public JSONArray cart = null;
     private ListView list;
@@ -80,11 +81,13 @@ public class CartActivity extends Activity {
                 data_color.add(c.getString(TAG_COLOR));
                 data_brand.add(c.getString(TAG_BRAND));
             }
+            Log.d(HWC, "data_name의 값 : " + data_name);
 
             for (int i = 0; i < data_name.size(); i++) {
                 ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i));
                 adapter.add(u);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
