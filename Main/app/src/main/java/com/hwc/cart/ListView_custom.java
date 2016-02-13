@@ -35,7 +35,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     // 리스트 아이템 데이터를 저장할 배열
     private ArrayList<ListView_getset> mData;
 
-    public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
+    public String imgUrl = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/images/coat.png";
     public Bitmap btp_test;
     public ImageView img_test;
 
