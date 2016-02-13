@@ -1,5 +1,9 @@
 package com.hwc.dao.common;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -28,9 +32,14 @@ import java.util.Vector;
 public class CommonDao {
 
     private String webServerURL = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com";
+    private Activity currentActivity;
 
     public String getWebServerURL() {
         return webServerURL;
+    }
+
+    public void setCurrentActivity(Activity activity) {
+        this.currentActivity = activity;
     }
 
     public void setWebServerURL(String webServerURL) {
@@ -113,6 +122,19 @@ public class CommonDao {
         return result;
     }
 
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connec = (ConnectivityManager) currentActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mobileInfo = connec.getNetworkInfo(0);
+        NetworkInfo wifiInfo = connec.getNetworkInfo(1);
+        NetworkInfo wimaxInfo = connec.getNetworkInfo(6);
+        boolean bm = false;
+        boolean bw = false;
+        boolean bx = false;
+        if (mobileInfo != null) bm = mobileInfo.isConnected();
+        if (wimaxInfo != null) bx = wimaxInfo.isConnected();
+        if (wifiInfo != null) bw = wifiInfo.isConnected();
+        return (bm || bw || bx);
+    }
 
 }
 

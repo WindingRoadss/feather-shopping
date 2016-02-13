@@ -206,4 +206,68 @@ public class NFCDao {
         return result;
     }
 
+    public HashMap<String, String>[] updateProductInfo(String tagId, String brandName, String serial
+            , String size, String color) throws ClientProtocolException, IOException {
+        // TODO Auto-generated method stub
+        String paramURL = commonDao.getWebServerURL() + "/php/NFC/updateTagIdToSelectedProduct.php";
+
+//        HttpPost request = makeHttpPost("id", id, "pwd", password,
+//                paramURL);
+        ArrayList<String> tagList = new ArrayList<String>();
+        ArrayList<String> valueList = new ArrayList<String>();
+
+        // 매개변수 List 데이터 삽입
+        tagList.add("tag");
+        valueList.add(tagId);
+        tagList.add("brand");
+        valueList.add(brandName);
+        tagList.add("serial");
+        valueList.add(serial);
+        tagList.add("size");
+        valueList.add(size);
+        tagList.add("color");
+        valueList.add(color);
+
+        HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(request);
+
+        // resultTags는 column 이름
+        ArrayList<String> resultTags = new ArrayList<String>();
+        //resultTags.add("price");
+        //resultTags.add("stock");
+        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        return result;
+    }
+
+    public HashMap<String, String>[] selectProductInfo(String tagId) throws ClientProtocolException, IOException {
+        // TODO Auto-generated method stub
+        String paramURL = commonDao.getWebServerURL() + "/php/NFC/usedNFCProductInfo.php";
+
+//        HttpPost request = makeHttpPost("id", id, "pwd", password,
+//                paramURL);
+        ArrayList<String> tagList = new ArrayList<String>();
+        ArrayList<String> valueList = new ArrayList<String>();
+
+        // 매개변수 List 데이터 삽입
+        tagList.add("tag");
+        valueList.add(tagId);
+
+        HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(request);
+
+        // resultTags는 column 이름
+        ArrayList<String> resultTags = new ArrayList<String>();
+        resultTags.add("serial");
+        resultTags.add("color");
+        resultTags.add("size");
+        resultTags.add("name");
+        resultTags.add("brand");
+        resultTags.add("price");
+        resultTags.add("stock");
+        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        return result;
+    }
+
 }
