@@ -42,11 +42,7 @@ public class CartActivity extends Activity {
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
     public ArrayList<String> data_brand = new ArrayList<>();
-<<<<<<< HEAD
-    public static ArrayList<String> data_image = new ArrayList<>();
-=======
     public ArrayList<String> data_image = new ArrayList<>();
->>>>>>> 3f4231c029521ec9a9a7a6b087df26871eb95f86
 
     public JSONArray cart = null;
     public ListView list;
