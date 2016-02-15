@@ -98,8 +98,8 @@ public class CommonDao {
             // if(!numResults.equals("0"))
             result = new HashMap[Integer.valueOf(numResults)];
             for(int hashIndex = 0; hashIndex < result.length; hashIndex++) {
+                result[hashIndex] = new HashMap<String, String>(); // 객체 생성
                 if (o.getString("status").equals("OK")) {
-                    result[hashIndex] = new HashMap<String, String>(); // 객체 생성
                     result[hashIndex].put("status", "OK");
                     JSONArray ja = o.getJSONArray("results");
                     for (String tag : tags) {
@@ -108,9 +108,12 @@ public class CommonDao {
                         Log.d("CommonDAO", "CommonDAO getresult list OK");
                         Log.d("CommonDAO", tag + " : " + jo.getString(tag));
                     }
-                } else if (o.getString("status").equals("FIN"))
+                }
+                else if (o.getString("status").equals("FIN")) {
                     result[hashIndex].put("status", "FIN");
+                }
                 else {
+                    Log.d("CommonDao", "hashIndex : " + Integer.toString(hashIndex));
                     result[hashIndex].put("status", "NO");
                     Log.d("CommonDAO", "CommonDAO getresult list NO");
                 }

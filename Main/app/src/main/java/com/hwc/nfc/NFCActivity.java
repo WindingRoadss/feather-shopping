@@ -1,10 +1,8 @@
-package com.hwc.main;
+package com.hwc.nfc;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -16,12 +14,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +25,7 @@ import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
+import com.hwc.main.R;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -45,7 +41,7 @@ public class NFCActivity extends Activity {
     private PendingIntent pendingIntent;
 
     private CommonDao commonDao;
-    NFCDao nfcDao;
+    private NFCDao nfcDao;
 
     //EditText url;           // url 입력 받는 부분
     //EditText aar;           // AAR 입력 받는 부분

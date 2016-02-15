@@ -40,10 +40,12 @@
         </activity>
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".SelectActivity" />
-        <activity android:name=".NFCActivity" />
+        <activity android:name="com.hwc.nfc.NFCActivity" />
         <activity android:name="com.hwc.cart.custom_list" />
         <activity android:name="com.hwc.cart.CartActivity" />
         <activity android:name="com.hwc.res.ResActivity" />
         <activity android:name="com.hwc.res.custom_res" />
+        <activity android:name="com.hwc.tagging.TaggingActivity" />
     </application>
 </manifest>
+
