@@ -42,7 +42,11 @@ public class CartActivity extends Activity {
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
     public ArrayList<String> data_brand = new ArrayList<>();
+<<<<<<< HEAD
     public static ArrayList<String> data_image = new ArrayList<>();
+=======
+    public ArrayList<String> data_image = new ArrayList<>();
+>>>>>>> 3f4231c029521ec9a9a7a6b087df26871eb95f86
 
     public JSONArray cart = null;
     public ListView list;
@@ -84,8 +88,8 @@ public class CartActivity extends Activity {
             }
             //Log.d(HWC, "data_image의 주소 : " + data_image);
 
-            for (int i = 0; i < data_name.size(); i++) {
-                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i));
+            for (int i = 0; i < cart.length(); i++) {
+                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i));
                 adapter.add(u);
             }
 

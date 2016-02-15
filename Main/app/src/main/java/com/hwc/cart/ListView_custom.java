@@ -12,8 +12,11 @@ import android.widget.TextView;
 
 import com.hwc.main.R;
 
+<<<<<<< HEAD
 import org.json.JSONArray;
 
+=======
+>>>>>>> 3f4231c029521ec9a9a7a6b087df26871eb95f86
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -42,6 +45,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     public Bitmap btp_test;
     public ImageView img_test;
 
+<<<<<<< HEAD
     // .php에서 가져오는 이미지 주소 (JSON으로 반환)
     public static final String HWC = "HWC";
     public static final String TAG_IMAGE = "PR_IMAGE";
@@ -51,6 +55,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     public JSONArray cart = null;
     public CartActivity ca = new CartActivity();
 
+=======
+>>>>>>> 3f4231c029521ec9a9a7a6b087df26871eb95f86
     public ListView_custom(Context context) {
         super();
         mContext = context;
@@ -168,7 +174,11 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         public void run() {
             try {
                 /* 이 곳에 반드시 data_image의 주소가 들어가야 한다. */
+<<<<<<< HEAD
                 URL url = new URL("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/images/coat.png"); // URL 주소를 이용해서 URL 객체 생성
+=======
+                URL url = new URL(lv_gst.getImage()); // URL 주소를 이용해서 URL 객체 생성
+>>>>>>> 3f4231c029521ec9a9a7a6b087df26871eb95f86
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
                 conn.connect();
