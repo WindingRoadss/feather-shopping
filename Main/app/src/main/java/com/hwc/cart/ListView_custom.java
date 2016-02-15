@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.hwc.main.R;
 
+import org.json.JSONArray;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -24,20 +26,30 @@ import java.util.ArrayList;
 
 public class ListView_custom extends BaseAdapter implements View.OnClickListener {
     // Activity에서 가져온 객체정보를 저장할 변수
-    private ListView_getset lv_gst;
-    private Context mContext;
+    public ListView_getset lv_gst;
+    public Context mContext;
     // ListView 내부 View들을 가르킬 변수들
-    private TextView txt_name;
-    private TextView txt_size;
-    private TextView txt_color;
-    private TextView txt_brand;
-    private String url_image;
+    public TextView txt_name;
+    public TextView txt_size;
+    public TextView txt_color;
+    public TextView txt_brand;
+    public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
-    private ArrayList<ListView_getset> mData;
+    public ArrayList<ListView_getset> mData;
 
-    public String imgUrl = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/images/coat.png";
+    public String temp_imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
+    public String imgUrl = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php";
     public Bitmap btp_test;
     public ImageView img_test;
+
+    // .php에서 가져오는 이미지 주소 (JSON으로 반환)
+    public static final String HWC = "HWC";
+    public static final String TAG_IMAGE = "PR_IMAGE";
+    public static final String TAG_RESULTS = "result";
+    public ArrayList<String> data_image = new ArrayList<>();
+    public String myJSON;
+    public JSONArray cart = null;
+    public CartActivity ca = new CartActivity();
 
     public ListView_custom(Context context) {
         super();
@@ -110,6 +122,9 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
+
+
+
             imageThread it = new imageThread();
             it.start();
 
@@ -148,13 +163,12 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         }*/
     }
 
-    class imageThread extends Thread
-    {
+    class imageThread extends Thread {
         @Override
-        public void run()
-        {
+        public void run() {
             try {
-                URL url = new URL(imgUrl); // URL 주소를 이용해서 URL 객체 생성
+                /* 이 곳에 반드시 data_image의 주소가 들어가야 한다. */
+                URL url = new URL("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/images/coat.png"); // URL 주소를 이용해서 URL 객체 생성
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
                 conn.connect();
@@ -164,6 +178,5 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
                 i.printStackTrace();
             }
         }
-
     }
 }
