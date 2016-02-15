@@ -62,14 +62,14 @@ public class NFCActivity extends Activity {
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
     private Button btnSave;
 
-    private boolean checkShowBrandThread = false; //showBrandThreadCheck
-    private boolean checkInsertTagThread = false; //showBrandThreadCheck
-    private boolean checkSelectAllBrandThread = false; //showBrandThreadCheck
-    private boolean checkSelectProudctNameThread = false; //showBrandThreadCheck
-    private boolean checkSelectSerial = false; //showBrandThreadCheck
-    private boolean checkSelectSize = false; //showBrandThreadCheck
-    private boolean checkSelectColor = false; //showBrandThreadCheck
-    private boolean checkSelectPriceStock = false; //showBrandThreadCheck
+    private boolean checkShowBrandThread = false;
+    private boolean checkInsertTagThread = false;
+    private boolean checkSelectAllBrandThread = false;
+    private boolean checkSelectProudctNameThread = false;
+    private boolean checkSelectSerial = false;
+    private boolean checkSelectSize = false;
+    private boolean checkSelectColor = false;
+    private boolean checkSelectPriceStock = false;
     private boolean checkUpdateProductInfo = false;
     private boolean checkSelectProductInfo = false;
 

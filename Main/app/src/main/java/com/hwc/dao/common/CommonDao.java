@@ -105,14 +105,14 @@ public class CommonDao {
                     for (String tag : tags) {
                         JSONObject jo = ja.getJSONObject(hashIndex);
                         result[hashIndex].put(tag, jo.getString(tag));
-                        Log.d("connecDB", "connectDB getresult list OK");
-                        Log.d("connecDB", "result : " + jo.getString(tag));
+                        Log.d("CommonDAO", "CommonDAO getresult list OK");
+                        Log.d("CommonDAO", tag + " : " + jo.getString(tag));
                     }
                 } else if (o.getString("status").equals("FIN"))
                     result[hashIndex].put("status", "FIN");
                 else {
                     result[hashIndex].put("status", "NO");
-                    Log.d("connecDB", "connectDB getresult list NO");
+                    Log.d("CommonDAO", "CommonDAO getresult list NO");
                 }
             }
         } catch (JSONException e) {
