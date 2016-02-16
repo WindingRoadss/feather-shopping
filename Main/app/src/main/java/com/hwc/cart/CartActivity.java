@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.hwc.main.R;
 
@@ -38,11 +40,15 @@ public class CartActivity extends Activity {
     public static final String TAG_NAME = "PR_NAME";
     public static final String TAG_BRAND = "PR_BRAND";
     public static final String TAG_IMAGE = "PR_IMAGE";
+    public static final String TAG_PRICE = "PR_PRICE";
     public ArrayList<String> data_name = new ArrayList<>();
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
     public ArrayList<String> data_brand = new ArrayList<>();
     public ArrayList<String> data_image = new ArrayList<>();
+    public ArrayList<String> data_price = new ArrayList<>();
+    public static ArrayList<Integer> data_intprice = new ArrayList<>();
+    public static int price_sum = 0;
 
     public JSONArray cart = null;
     public ListView list;
@@ -52,14 +58,19 @@ public class CartActivity extends Activity {
     public Bitmap btp_test;
     public ImageView img_test;
 
+    private TextView txt_intprice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        txt_intprice = (TextView)findViewById(R.id.txt_intprice);
+        //txt_intprice.setText("가격 : 테스트중");
+
         //cartList = new ArrayList<>();
-        getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php");
+        getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/cart/cart.php");
 
 
     }
@@ -81,13 +92,23 @@ public class CartActivity extends Activity {
                 data_color.add(c.getString(TAG_COLOR));
                 data_brand.add(c.getString(TAG_BRAND));
                 data_image.add(c.getString(TAG_IMAGE));
+                data_price.add(c.getString(TAG_PRICE));
+
+                data_intprice.add(Integer.parseInt(data_price.get(i)));
+                price_sum += data_intprice.get(i);
             }
             //Log.d(HWC, "data_image의 주소 : " + data_image);
 
+            Log.d(HWC, "price_sum의 값 : " + price_sum);
+
+            txt_intprice.setText("가격 : " + Integer.toString(price_sum));
+
             for (int i = 0; i < cart.length(); i++) {
-                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i));
+                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i),  data_image.get(i), data_price.get(i));
                 adapter.add(u);
             }
+
+
 
         } catch (JSONException e) {
             e.printStackTrace();

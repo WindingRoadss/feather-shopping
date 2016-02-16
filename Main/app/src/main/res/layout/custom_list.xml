@@ -46,6 +46,15 @@
         android:gravity="left"
         android:textStyle="bold" />
 
+    <TextView
+        android:textColor="#000000"
+        android:typeface="sans"
+        android:id="@+id/txt_price"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:textStyle="bold" />
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

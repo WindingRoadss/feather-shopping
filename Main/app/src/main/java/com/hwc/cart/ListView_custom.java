@@ -26,17 +26,21 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     // Activity에서 가져온 객체정보를 저장할 변수
     public ListView_getset lv_gst;
     public Context mContext;
+    public CartActivity ca;
+
+    public void setCartActivity(CartActivity cartActivity) {
+        ca = cartActivity;
+    }
     // ListView 내부 View들을 가르킬 변수들
     public TextView txt_name;
     public TextView txt_size;
     public TextView txt_color;
     public TextView txt_brand;
+    public TextView txt_price;
     public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<ListView_getset> mData;
 
-    public String temp_imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
-    public String imgUrl = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/test.php";
     public Bitmap btp_test;
     public ImageView img_test;
 
@@ -92,6 +96,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_size = (TextView) v.findViewById(R.id.txt_size);
             txt_color = (TextView) v.findViewById(R.id.txt_color);
             txt_brand = (TextView) v.findViewById(R.id.txt_brand);
+            txt_price = (TextView) v.findViewById(R.id.txt_price);
             //url_image = (TextView) v.findViewById(R.id.url_image);
             //btnSend = (Button) v.findViewById(R.id.bt_detail);
             img_test = (ImageView) v.findViewById(R.id.img_test);
@@ -100,6 +105,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
 
         // 받아온 position 값을 이용하여 배열에서 아이템을 가져온다.
         lv_gst = getItem(position);
+
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
         //btnSend.setTag(lv_gst);
@@ -111,7 +117,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
-
+            txt_price.setText(lv_gst.getPrice());
 
 
             imageThread it = new imageThread();
