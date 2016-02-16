@@ -3,10 +3,13 @@ package com.hwc.cart;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,27 +25,31 @@ import java.util.ArrayList;
  * Created by hyunwoo794 on 2016-01-18.
  */
 
-public class ListView_custom extends BaseAdapter implements View.OnClickListener {
+public class ListView_custom extends BaseAdapter implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private ListView_custom mCustomAdapter = null;
     // Activity에서 가져온 객체정보를 저장할 변수
     public ListView_getset lv_gst;
     public Context mContext;
     public CartActivity ca;
+    public static final String HWC = "HWC";
+    public static int price_sum = 0;
 
-    public void setCartActivity(CartActivity cartActivity) {
-        ca = cartActivity;
-    }
     // ListView 내부 View들을 가르킬 변수들
     public TextView txt_name;
     public TextView txt_size;
     public TextView txt_color;
     public TextView txt_brand;
     public TextView txt_price;
+    public ImageView img_test;
+    public CheckBox chk_add;
     public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<ListView_getset> mData;
-
     public Bitmap btp_test;
-    public ImageView img_test;
+    public boolean flag = false;
+    private ArrayList<String> sArrayList = new ArrayList<>();
+    private boolean[] isCheckedConfrim;
+
 
     public ListView_custom(Context context) {
         super();
@@ -69,6 +76,14 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    public ListView_custom (Context c , ArrayList<String> mList){
+        inflater = LayoutInflater.from(c);
+        this.sArrayList = mList;
+        // ArrayList Size 만큼의 boolean 배열을 만든다.
+        // CheckBox의 true/false를 구별 하기 위해
+        this.isCheckedConfrim = new boolean[sArrayList.size()];
     }
 
     @Override
@@ -100,6 +115,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             //url_image = (TextView) v.findViewById(R.id.url_image);
             //btnSend = (Button) v.findViewById(R.id.bt_detail);
             img_test = (ImageView) v.findViewById(R.id.img_test);
+            chk_add = (CheckBox) v.findViewById(R.id.chk_add);
 
         }
 
@@ -108,7 +124,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
 
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
-        //btnSend.setTag(lv_gst);
+        chk_add.setTag(lv_gst);
 
         // 데이터의 실존 여부를 판별합니다.
         if (lv_gst != null) {
@@ -119,10 +135,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
 
-
             imageThread it = new imageThread();
             it.start();
-
             try {
                 //  메인 스레드는 작업 스레드가 이미지 작업을 가져올 때까지
                 //  대기해야 하므로 작업스레드의 join() 메소드를 호출해서
@@ -134,8 +148,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //url_image.setText(lv_gst.getUserManager());
-            //btnSend.setOnClickListener(this);
+            chk_add.setOnCheckedChangeListener(this);
         }
         // 완성된 아이템 뷰를 반환합니다.
         return v;
@@ -149,14 +162,34 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     @Override
     public void onClick(View v) {
         // Tag를 이용하여 Data를 가져옵니다.
-        ListView_getset clickItem = (ListView_getset) v.getTag();
+        //ListView_getset clickItem = (ListView_getset) v.getTag();
         /*switch (v.getId()) {
-            case R.id.bt_detail:
-                Intent intent = new Intent(mContext, InputActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
+            case R.id.chk_add:
+                for (int i = 0; i < ca.cart.length(); i++) {
+                    Log.d(HWC, "price_sum = " + price_sum + " data_intprice = " + ca.data_intprice);
+                    price_sum += ca.data_intprice.get(i);
+                }
         }*/
     }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            flag = true;
+            //Log.d(HWC, "" + ca.data_intprice);
+            for(int i = 0; i <ca.cart.length(); i++) {
+                if() {
+                    price_sum += ca.data_intprice.get(i);
+                    CartActivity.setTextPrice(price_sum);
+                }
+            }
+            //Log.d(HWC, "" + price_sum);
+        } else {
+            flag = false;
+            Log.d(HWC, "false");
+        }
+    }
+
 
     class imageThread extends Thread {
         @Override
@@ -174,4 +207,5 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             }
         }
     }
+
 }
