@@ -78,14 +78,14 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         return 0;
     }
 
-    public ListView_custom (Context c , ArrayList<String> mList){
+    /*public ListView_custom (Context c , ArrayList<String> mList){
         inflater = LayoutInflater.from(c);
         this.sArrayList = mList;
         // ArrayList Size 만큼의 boolean 배열을 만든다.
         // CheckBox의 true/false를 구별 하기 위해
         this.isCheckedConfrim = new boolean[sArrayList.size()];
     }
-
+*/
     @Override
     /**
      * getView
@@ -178,10 +178,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             flag = true;
             //Log.d(HWC, "" + ca.data_intprice);
             for(int i = 0; i <ca.cart.length(); i++) {
-                if() {
                     price_sum += ca.data_intprice.get(i);
                     CartActivity.setTextPrice(price_sum);
-                }
             }
             //Log.d(HWC, "" + price_sum);
         } else {

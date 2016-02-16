@@ -70,11 +70,6 @@ public class CartActivity extends Activity {
 
         //cartList = new ArrayList<>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/cart.php");
-<<<<<<< HEAD
-
-
-=======
->>>>>>> c9dc956df8e801de728b437837e3a58bbd3e9cd2
     }
 
     public void showList() {
