@@ -5,14 +5,9 @@
 
     <item android:state_pressed="false">
         <layer-list>
-
+            <item>
                 <shape>
-
-                </shape>
-
-            <item android:bottom="2dp" android:right="2dp">
-                <shape>
-                    <gradient android:angle="270" android:endColor="#B2EBF4" android:startColor="#B2EBF4" />
+                    <gradient android:endColor="#B2EBF4" android:startColor="#B2EBF4" />
                 </shape>
             </item>
         </layer-list>
@@ -20,14 +15,9 @@
 
     <item android:state_pressed="true">
         <layer-list>
-
+            <item>
                 <shape>
-
-                </shape>
-
-            <item android:bottom="2dp" android:right="2dp">
-                <shape>
-                    <gradient android:angle="270" android:endColor="#008299" android:startColor="#008299" />
+                    <gradient android:endColor="#008299" android:startColor="#008299" />
                 </shape>
             </item>
         </layer-list>
