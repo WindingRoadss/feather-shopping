@@ -70,7 +70,7 @@ public class CartActivity extends Activity {
         //txt_intprice.setText("가격 : 테스트중");
 
         //cartList = new ArrayList<>();
-        getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/cart/cart.php");
+        getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/cart.php");
 
 
     }
