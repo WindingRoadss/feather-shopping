@@ -3,7 +3,6 @@ package com.hwc.cart;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
  * Created by hyunwoo794 on 2016-01-18.
  */
 
-public class ListView_custom extends BaseAdapter implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class ListView_custom extends BaseAdapter implements View.OnClickListener {
     private ListView_custom mCustomAdapter = null;
     // Activity에서 가져온 객체정보를 저장할 변수
     public ListView_getset lv_gst;
@@ -46,10 +45,6 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<ListView_getset> mData;
     public Bitmap btp_test;
-    public boolean flag = false;
-    private ArrayList<String> sArrayList = new ArrayList<>();
-    private boolean[] isCheckedConfrim;
-
 
     public ListView_custom(Context context) {
         super();
@@ -78,14 +73,6 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         return 0;
     }
 
-    public ListView_custom (Context c , ArrayList<String> mList){
-        inflater = LayoutInflater.from(c);
-        this.sArrayList = mList;
-        // ArrayList Size 만큼의 boolean 배열을 만든다.
-        // CheckBox의 true/false를 구별 하기 위해
-        this.isCheckedConfrim = new boolean[sArrayList.size()];
-    }
-
     @Override
     /**
      * getView
@@ -95,9 +82,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
      * @param parent - 현재 뷰의 부모를 지칭하지만 특별히 사용되지는 않는다.
      * @return 리스트 아이템이 저장된 convertView
      */
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View v = convertView;
-
         // 리스트 아이템이 새로 추가될 경우에는 v가 null값이다.
         // view는 어느 정도 생성된 뒤에는 재사용이 일어나기 때문에 효율을 위해서 해준다.
         if (v == null) {
@@ -116,12 +102,10 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             //btnSend = (Button) v.findViewById(R.id.bt_detail);
             img_test = (ImageView) v.findViewById(R.id.img_test);
             chk_add = (CheckBox) v.findViewById(R.id.chk_add);
-
         }
 
         // 받아온 position 값을 이용하여 배열에서 아이템을 가져온다.
         lv_gst = getItem(position);
-
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
         chk_add.setTag(lv_gst);
@@ -148,7 +132,18 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            chk_add.setOnCheckedChangeListener(this);
+
+            chk_add.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+                    if (checked) {
+                        price_sum += ca.data_intprice.get(position);
+                        CartActivity.setTextPrice(price_sum);
+                    } else {
+                        price_sum -= ca.data_intprice.get(position);
+                        CartActivity.setTextPrice(price_sum);
+                    }
+                }
+            });
         }
         // 완성된 아이템 뷰를 반환합니다.
         return v;
@@ -172,24 +167,24 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         }*/
     }
 
+    /*
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             flag = true;
             //Log.d(HWC, "" + ca.data_intprice);
             for(int i = 0; i <ca.cart.length(); i++) {
-                if() {
+
                     price_sum += ca.data_intprice.get(i);
                     CartActivity.setTextPrice(price_sum);
-                }
+
             }
             //Log.d(HWC, "" + price_sum);
         } else {
             flag = false;
             Log.d(HWC, "false");
         }
-    }
-
+    }*/
 
     class imageThread extends Thread {
         @Override

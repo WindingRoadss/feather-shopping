@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -147,5 +148,15 @@ public class CartActivity extends Activity {
         }
         GetDataJSON g = new GetDataJSON();
         g.execute(url);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                adapter.price_sum = 0;
+                finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
