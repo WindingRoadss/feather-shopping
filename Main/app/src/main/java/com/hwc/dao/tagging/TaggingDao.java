@@ -49,7 +49,7 @@ public class TaggingDao {
         return result;
     }
 
-    public HashMap<String, String>[] insertProductPaying(String userId, String count, String serial
+    public HashMap<String, String> insertProductPaying(String userId, String count, String serial
             , String size, String color) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/tagging/insertToPaidCart.php";
@@ -79,11 +79,11 @@ public class TaggingDao {
         ArrayList<String> resultTags = new ArrayList<String>();
         //resultTags.add("price");
         //resultTags.add("stock");
-        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        HashMap<String, String> result = commonDao.getResultNoArray(response, resultTags);
         return result;
     }
 
-    public HashMap<String, String>[] insertProductIntoCart(String userId, String count, String serial
+    public HashMap<String, String> insertProductIntoCart(String userId, String count, String serial
             , String size, String color) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/tagging/insertToCart.php";
@@ -113,7 +113,7 @@ public class TaggingDao {
         ArrayList<String> resultTags = new ArrayList<String>();
         //resultTags.add("price");
         //resultTags.add("stock");
-        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        HashMap<String, String> result = commonDao.getResultNoArray(response, resultTags);
         return result;
     }
 

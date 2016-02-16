@@ -300,7 +300,7 @@ public class TaggingActivity extends Activity {
                 byte[] tagId = tag.getId();
 
                 tvTagId.setText("포맷이 필요합니다" + byteArrayToHex(tagId)); // tvTagId 세팅
-                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
                 return true;
 
@@ -313,10 +313,10 @@ public class TaggingActivity extends Activity {
 
                 byte[] tagId = tag.getId();
 
-                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
 
                 tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
                 execSelectProductInfoThread();
 
@@ -379,7 +379,7 @@ public class TaggingActivity extends Activity {
 
                 final HashMap<String, String>[] result = taggingDao.selectProductInfo(tagId);
 
-                printToastInThread("ThreadSelectProductInfo In");
+                // printToastInThread("ThreadSelectProductInfo In");
 
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
@@ -443,18 +443,16 @@ public class TaggingActivity extends Activity {
                 Log.d("cart insert", "selectedSize : " + selectedSize);
                 Log.d("cart insert", "selectedColor : " + selectedColor);
 
-                final HashMap<String, String>[] result = taggingDao.insertProductIntoCart(userId,
+                final HashMap<String, String> result = taggingDao.insertProductIntoCart(userId,
                         selectedCount, selectedSerial, selectedSize, selectedColor);
 
-                printToastInThread("ThreadInsertProductIntoCart In");
+                // printToastInThread("ThreadInsertProductIntoCart In");
 
                 if(result != null) {
-                    for (HashMap<String, String> hashMap : result) {
-                        if (hashMap.get("status") == "OK") {
-                            printToastInThread("ThreadInsertProductIntoCart Success");
-                        } else {
-                            printToastInThread("ThreadInsertProductIntoCart Fail");
-                        }
+                    if (result.get("status") == "OK") {
+                        printToastInThread("ThreadInsertProductIntoCart Success" + " Message : " + result.get("message"));
+                    } else {
+                        printToastInThread("ThreadInsertProductIntoCart Fail" + " Message : " + result.get("message"));
                     }
                 }
                 else {
@@ -491,18 +489,16 @@ public class TaggingActivity extends Activity {
 
                 selectedCount = edtRequestCount.getText().toString(); // 구매할 개수
 
-                final HashMap<String, String>[] result = taggingDao.insertProductPaying(userId,
+                final HashMap<String, String> result = taggingDao.insertProductPaying(userId,
                         selectedCount, selectedSerial, selectedSize, selectedColor);
 
-                printToastInThread("ThreadInsertProductPaying In");
+                // printToastInThread("ThreadInsertProductPaying In");
 
                 if(result != null) {
-                    for (HashMap<String, String> hashMap : result) {
-                        if (hashMap.get("status") == "OK") {
-                            printToastInThread("ThreadInsertProductPaying Success");
-                        } else {
-                            printToastInThread("ThreadInsertProductPaying Fail");
-                        }
+                    if (result.get("status") == "OK") {
+                        printToastInThread("ThreadInsertProductPaying Success" + " Message : " + result.get("message"));
+                    } else {
+                        printToastInThread("ThreadInsertProductPaying Fail" + " Message : " + result.get("message"));
                     }
                 }
                 else {
@@ -560,9 +556,11 @@ public class TaggingActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinSize.setAdapter(adapterSize);
-                            if (!selectedSize.equals(null) || !selectedSize.equals("")) {
-                                int spinPosition = adapterSize.getPosition(selectedSize);
-                                spinSize.setSelection(spinPosition);
+                            if(selectedSize != null) {
+                                if (!selectedSize.equals("")) {
+                                    int spinPosition = adapterSize.getPosition(selectedSize);
+                                    spinSize.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -619,9 +617,11 @@ public class TaggingActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinColor.setAdapter(adapterColor);
-                            if (!selectedColor.equals(null) || !selectedColor.equals("")) {
-                                int spinPosition = adapterColor.getPosition(selectedColor);
-                                spinColor.setSelection(spinPosition);
+                            if(selectedColor != null) {
+                                if (!selectedColor.equals("")) {
+                                    int spinPosition = adapterColor.getPosition(selectedColor);
+                                    spinColor.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -662,13 +662,14 @@ public class TaggingActivity extends Activity {
                 String stock = null;
                 String price = null;
 
-                for(HashMap<String, String> hashMap : result) {
-                    if (hashMap.get("status") == "OK") {
-                        stock = hashMap.get("stock"); // 브랜드 리스트
-                        price = hashMap.get("price"); // 브랜드 리스트
-                    }
-                    else {
-                        printToastInThread("selectColor Fail");
+                if(result != null) {
+                    for (HashMap<String, String> hashMap : result) {
+                        if (hashMap.get("status") == "OK") {
+                            stock = hashMap.get("stock"); // 브랜드 리스트
+                            price = hashMap.get("price"); // 브랜드 리스트
+                        } else {
+                            printToastInThread("selectColor Fail");
+                        }
                     }
                 }
 

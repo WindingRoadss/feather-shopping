@@ -19,7 +19,7 @@ public class NFCDao {
 
     private CommonDao commonDao = new CommonDao();
 
-    public HashMap<String, String>[] insertTag(String tagId)
+    public HashMap<String, String> insertTag(String tagId)
             throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/NFC/addNewTagIdToTBNFC.php";
@@ -41,7 +41,7 @@ public class NFCDao {
         ArrayList<String> resultTags = new ArrayList<String>();
 //        resultTags.add("user_name");
 //        resultTags.add("email");
-        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        HashMap<String, String> result = commonDao.getResultNoArray(response, resultTags);
         return result;
     }
 
@@ -206,7 +206,7 @@ public class NFCDao {
         return result;
     }
 
-    public HashMap<String, String>[] updateProductInfo(String tagId, String brandName, String serial
+    public HashMap<String, String> updateProductInfo(String tagId, String brandName, String serial
             , String size, String color) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/NFC/updateTagIdToSelectedProduct.php";
@@ -236,7 +236,7 @@ public class NFCDao {
         ArrayList<String> resultTags = new ArrayList<String>();
         //resultTags.add("price");
         //resultTags.add("stock");
-        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        HashMap<String, String> result = commonDao.getResultNoArray(response, resultTags);
         return result;
     }
 
@@ -266,6 +266,30 @@ public class NFCDao {
         resultTags.add("brand");
         resultTags.add("price");
         resultTags.add("stock");
+        HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
+        return result;
+    }
+
+    public HashMap<String, String>[] selectIsUsed(String tagId) throws ClientProtocolException, IOException {
+        // TODO Auto-generated method stub
+        String paramURL = commonDao.getWebServerURL() + "/php/NFC/checkUsedNFC.php";
+
+//        HttpPost request = makeHttpPost("id", id, "pwd", password,
+//                paramURL);
+        ArrayList<String> tagList = new ArrayList<String>();
+        ArrayList<String> valueList = new ArrayList<String>();
+
+        // 매개변수 List 데이터 삽입
+        tagList.add("tag");
+        valueList.add(tagId);
+
+        HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(request);
+
+        // resultTags는 column 이름
+        ArrayList<String> resultTags = new ArrayList<String>();
+        resultTags.add("used");
         HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
         return result;
     }
