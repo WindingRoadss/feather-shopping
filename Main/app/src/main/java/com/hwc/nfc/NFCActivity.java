@@ -689,6 +689,10 @@ public class NFCActivity extends Activity {
                 else {
                     handler.post(new Runnable() {
                         public void run() {
+                            selectedProductName = null;
+                            selectedSerial = null;
+                            selectedSize = null;
+                            selectedColor = null;
                             deleteItemsInSpin(spinProductName); // Item delete
                             deleteItemsInSpin(spinSerial); // Item delete
                             deleteItemsInSpin(spinSize); // Item delete
@@ -752,6 +756,9 @@ public class NFCActivity extends Activity {
                 else {
                     handler.post(new Runnable() {
                         public void run() {
+                            selectedSerial = null;
+                            selectedSize = null;
+                            selectedColor = null;
                             deleteItemsInSpin(spinSerial); // Item delete
                             deleteItemsInSpin(spinSize); // Item delete
                             deleteItemsInSpin(spinColor); // Item delete
@@ -814,6 +821,8 @@ public class NFCActivity extends Activity {
                 else {
                     handler.post(new Runnable() {
                         public void run() {
+                            selectedSize = null;
+                            selectedColor = null;
                             deleteItemsInSpin(spinSize); // Item delete
                             deleteItemsInSpin(spinColor); // Item delete
                             tvPrice.setText(null);
@@ -875,6 +884,7 @@ public class NFCActivity extends Activity {
                 else {
                     handler.post(new Runnable() {
                         public void run() {
+                            selectedColor = null;
                             deleteItemsInSpin(spinColor); // Item delete
                             tvPrice.setText(null);
                             tvStock.setText(null);
@@ -1082,16 +1092,37 @@ public class NFCActivity extends Activity {
     public void execForUnusedTagThread() {
 
         // 최초일 때만 InsertTag
-        if (checkInsertTagThread == true) {
-            threadInsertTag.interrupt();
-        }
+//        if (checkInsertTagThread == true) {
+//            threadInsertTag.interrupt();
+//        }
+
+        // Looper.getMainLooper() : main UI 접근하기 위함
+        // main UI 내의 요소를 변경하기 위한 핸들러
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        handler.post(new Runnable() {
+            public void run() {
+                selectedBrand = null;
+                selectedProductName = null;
+                selectedSerial = null;
+                selectedSize = null;
+                selectedColor = null;
+
+                deleteItemsInSpin(spinProductName); // Item delete
+                deleteItemsInSpin(spinSerial); // Item delete
+                deleteItemsInSpin(spinSize); // Item delete
+                deleteItemsInSpin(spinColor); // Item delete
+                tvPrice.setText(null);
+                tvStock.setText(null);
+            }
+        });
 
         if (checkSelectAllBrandThread == true) {
             threadSelectAllBrand.interrupt();
         }
 
-        threadInsertTag = new ThreadInsertTag();
-        threadInsertTag.start();
+//        threadInsertTag = new ThreadInsertTag();
+//        threadInsertTag.start();
 
         threadSelectAllBrand = new ThreadSelectAllBrand();
         threadSelectAllBrand.start();
