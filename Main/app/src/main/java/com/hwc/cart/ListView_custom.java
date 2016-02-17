@@ -3,10 +3,12 @@ package com.hwc.cart;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
  * Created by hyunwoo794 on 2016-01-18.
  */
 
-public class ListView_custom extends BaseAdapter implements View.OnClickListener {
+public class ListView_custom extends BaseAdapter {
     private ListView_custom mCustomAdapter = null;
     // Activity에서 가져온 객체정보를 저장할 변수
     public ListView_getset lv_gst;
@@ -32,6 +34,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     public CartActivity ca;
     public static final String HWC = "HWC";
     public static int price_sum = 0;
+    public int temp_sum[] = {0,};
 
     // ListView 내부 View들을 가르킬 변수들
     public TextView txt_name;
@@ -39,12 +42,18 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
     public TextView txt_color;
     public TextView txt_brand;
     public TextView txt_price;
+    public TextView txt_eachsize;
     public ImageView img_test;
     public CheckBox chk_add;
     public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<ListView_getset> mData;
     public Bitmap btp_test;
+    public Button bt_add;
+    public Button bt_minus;
+    public int count[] = {1, };
+    public boolean flag[] = {false, };
+
 
     public ListView_custom(Context context) {
         super();
@@ -98,8 +107,11 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_color = (TextView) v.findViewById(R.id.txt_color);
             txt_brand = (TextView) v.findViewById(R.id.txt_brand);
             txt_price = (TextView) v.findViewById(R.id.txt_price);
+            txt_eachsize = (TextView) v.findViewById(R.id.txt_eachsize);
             //url_image = (TextView) v.findViewById(R.id.url_image);
             //btnSend = (Button) v.findViewById(R.id.bt_detail);
+            bt_add = (Button) v.findViewById(R.id.bt_add);
+            bt_minus = (Button) v.findViewById(R.id.bt_minus);
             img_test = (ImageView) v.findViewById(R.id.img_test);
             chk_add = (CheckBox) v.findViewById(R.id.chk_add);
         }
@@ -109,6 +121,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
         chk_add.setTag(lv_gst);
+        bt_add.setTag(lv_gst);
+        bt_minus.setTag(lv_gst);
 
         // 데이터의 실존 여부를 판별합니다.
         if (lv_gst != null) {
@@ -118,7 +132,6 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
-
             imageThread it = new imageThread();
             it.start();
             try {
@@ -136,14 +149,65 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             chk_add.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
                     if (checked) {
+                        count[position] = 1;
+                        price_sum = 0;
                         price_sum += ca.data_intprice.get(position);
                         CartActivity.setTextPrice(price_sum);
+                        txt_eachsize.setText(Integer.toString(count[position]));
+                        flag[position] = true;
+                        Log.d(HWC, "price_sum : " + price_sum);
+                        Log.d(HWC, "count : " + count);
+                        Log.d(HWC, "data_intprice : " + ca.data_intprice.get(position));
+                        Log.d(HWC, "temp_sum : " + temp_sum[position]);
+                        Log.d(HWC, "flag : " + flag);
+
                     } else {
-                        price_sum -= ca.data_intprice.get(position);
+                        temp_sum[position] = 0;
+                        price_sum -= (ca.data_intprice.get(position) + temp_sum[position]);
                         CartActivity.setTextPrice(price_sum);
+                        flag[position] = false;
+                        Log.d(HWC, "price_sum : " + price_sum);
+                        Log.d(HWC, "count : " + count);
+                        Log.d(HWC, "data_intprice : " + ca.data_intprice.get(position));
+                        Log.d(HWC, "temp_sum : " + temp_sum[position]);
+                        Log.d(HWC, "flag : " + flag);
                     }
                 }
             });
+
+
+            bt_add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (flag[position] == true) {
+                        temp_sum[position] += ca.data_intprice.get(position);
+                        CartActivity.setTextPrice(temp_sum[position] + price_sum);
+                        Log.d(HWC, "price_sum : " + price_sum);
+                        Log.d(HWC, "count : " + count);
+                        Log.d(HWC, "data_intprice : " + ca.data_intprice.get(position));
+                        Log.d(HWC, "temp_sum : " + temp_sum[position]);
+                        Log.d(HWC, "flag : " + flag);
+                    }
+                }
+            });
+
+            bt_minus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (flag[position] == true) {
+                        if(temp_sum[position] > 0) {
+                            temp_sum[position] -= ca.data_intprice.get(position);
+                            CartActivity.setTextPrice(temp_sum[position]);
+                            Log.d(HWC, "price_sum : " + price_sum);
+                            Log.d(HWC, "count : " + count);
+                            Log.d(HWC, "data_intprice : " + ca.data_intprice.get(position));
+                            Log.d(HWC, "temp_sum : " + temp_sum[position]);
+                            Log.d(HWC, "flag : " + flag);
+                        }
+                    }
+                }
+            });
+
         }
         // 완성된 아이템 뷰를 반환합니다.
         return v;
@@ -154,18 +218,20 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
         mData.add(user);
     }
 
-    @Override
+    /*@Override
     public void onClick(View v) {
         // Tag를 이용하여 Data를 가져옵니다.
         //ListView_getset clickItem = (ListView_getset) v.getTag();
-        /*switch (v.getId()) {
-            case R.id.chk_add:
-                for (int i = 0; i < ca.cart.length(); i++) {
-                    Log.d(HWC, "price_sum = " + price_sum + " data_intprice = " + ca.data_intprice);
-                    price_sum += ca.data_intprice.get(i);
-                }
-        }*/
-    }
+        switch (v.getId()) {
+            case R.id.bt_add:
+                //Log.d(HWC, "+");
+
+                break;
+            case R.id.bt_minus:
+                //Log.d(HWC, "-");
+                break;
+        }
+    }*/
 
     /*
     @Override
@@ -180,6 +246,7 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
 
             }
             //Log.d(HWC, "" + price_sum);
+        public void run() {
         } else {
             flag = false;
             Log.d(HWC, "false");
@@ -188,7 +255,8 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
 
     class imageThread extends Thread {
         @Override
-        public void run() {
+        public void run()
+        {
             try {
                 /* 이 곳에 반드시 data_image의 주소가 들어가야 한다. */
                 URL url = new URL(lv_gst.getImage()); // URL 주소를 이용해서 URL 객체 생성
@@ -202,5 +270,4 @@ public class ListView_custom extends BaseAdapter implements View.OnClickListener
             }
         }
     }
-
 }
