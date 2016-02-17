@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.hwc.cart.CartActivity;
 import com.hwc.nfc.NFCActivity;
+import com.hwc.paid.PaidActivity;
 import com.hwc.tagging.TaggingActivity;
 
 public class SelectActivity extends Activity {
@@ -45,5 +46,13 @@ public class SelectActivity extends Activity {
             }
         });
 
+        Button btnPaid = (Button) findViewById(R.id.btnPaid);
+        btnPaid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getBaseContext(), PaidActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

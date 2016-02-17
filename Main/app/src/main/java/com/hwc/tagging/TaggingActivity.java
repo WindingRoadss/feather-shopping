@@ -3,17 +3,12 @@ package com.hwc.tagging;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,8 +19,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Charsets;
-import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.dao.tagging.TaggingDao;
@@ -34,10 +27,8 @@ import com.hwc.main.R;
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class TaggingActivity extends Activity {
 

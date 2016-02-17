@@ -43,4 +43,13 @@
         android:layout_below="@+id/btnTagging"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="구매목록"
+        android:id="@+id/btnPaid"
+        android:layout_below="@+id/btnCart"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
