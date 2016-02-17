@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="태깅"
-        android:id="@+id/btnProductInfo"
+        android:id="@+id/btnTagging"
         android:layout_below="@+id/btnNFCInfo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:text="장바구니"
         android:id="@+id/btnCart"
-        android:layout_below="@+id/btnProductInfo"
+        android:layout_below="@+id/btnTagging"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

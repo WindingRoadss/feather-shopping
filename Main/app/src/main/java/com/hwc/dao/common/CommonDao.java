@@ -78,6 +78,57 @@ public class CommonDao {
         return request;
     }
 
+    //json parsing : 하나의 레코드만 반환받는다
+    public HashMap<String, String> getResultNoArray(HttpResponse response, ArrayList<String> tags) //results가 여러개 넘어오기 때문에
+            throws IllegalStateException, IOException {
+
+        HashMap<String, String> result = null; //= new HashMap<String, String>()[];
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+
+        StringBuffer sb = new StringBuffer();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        Log.d("sb result", "sb result : " + sb.toString());
+        JSONObject o;
+        try {
+            o = new JSONObject(sb.toString());
+            String numResults = o.getString("num_results");
+            // if(!numResults.equals("0"))
+            result = new HashMap<String, String>();
+
+            result.put("message", o.getString("message")); // 메시지 저장
+
+            if (o.getString("status").equals("OK")) {
+                result.put("status", "OK");
+                JSONArray ja = o.getJSONArray("results");
+                if(!numResults.equals("0")) {
+                    int tagLength = 0;
+                    for (String tag : tags) {
+                        JSONObject jo = ja.getJSONObject(tagLength);
+                        result.put(tag, jo.getString(tag));
+                        Log.d("CommonDAO", "CommonDAO get result no array list OK");
+                        Log.d("CommonDAO", tag + " : " + jo.getString(tag));
+                        tagLength++;
+                    }
+                }
+            }
+            else if (o.getString("status").equals("FIN")) {
+                result.put("status", "FIN");
+            }
+            else {
+                result.put("status", "NO");
+                Log.d("CommonDAO", "CommonDAO getresult list NO");
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     //json parsing
     public HashMap<String, String>[] getResult(HttpResponse response, ArrayList<String> tags) //results가 여러개 넘어오기 때문에
             throws IllegalStateException, IOException {
@@ -96,10 +147,13 @@ public class CommonDao {
             o = new JSONObject(sb.toString());
             String numResults = o.getString("num_results");
             // if(!numResults.equals("0"))
-            result = new HashMap[Integer.valueOf(numResults)];
+            if(numResults.equals("0"))
+                return null;
+            else
+                result = new HashMap[Integer.valueOf(numResults)];
             for(int hashIndex = 0; hashIndex < result.length; hashIndex++) {
+                result[hashIndex] = new HashMap<String, String>(); // 객체 생성
                 if (o.getString("status").equals("OK")) {
-                    result[hashIndex] = new HashMap<String, String>(); // 객체 생성
                     result[hashIndex].put("status", "OK");
                     JSONArray ja = o.getJSONArray("results");
                     for (String tag : tags) {
@@ -108,9 +162,12 @@ public class CommonDao {
                         Log.d("CommonDAO", "CommonDAO getresult list OK");
                         Log.d("CommonDAO", tag + " : " + jo.getString(tag));
                     }
-                } else if (o.getString("status").equals("FIN"))
+                }
+                else if (o.getString("status").equals("FIN")) {
                     result[hashIndex].put("status", "FIN");
+                }
                 else {
+                    Log.d("CommonDao", "hashIndex : " + Integer.toString(hashIndex));
                     result[hashIndex].put("status", "NO");
                     Log.d("CommonDAO", "CommonDAO getresult list NO");
                 }

@@ -1,10 +1,8 @@
-package com.hwc.main;
+package com.hwc.nfc;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -16,12 +14,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +25,7 @@ import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
+import com.hwc.main.R;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -45,22 +41,23 @@ public class NFCActivity extends Activity {
     private PendingIntent pendingIntent;
 
     private CommonDao commonDao;
-    NFCDao nfcDao;
+    private NFCDao nfcDao;
 
     //EditText url;           // url 입력 받는 부분
     //EditText aar;           // AAR 입력 받는 부분
     /* branch test */
     private String url;
     private String aar;
-    private String selectedBrand;
-    private String selectedProductName;
-    private String selectedSerial;
-    private String selectedSize;
-    private String selectedColor;
+    private String selectedBrand = null;
+    private String selectedProductName = null;
+    private String selectedSerial = null;
+    private String selectedSize = null;
+    private String selectedColor = null;
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
     private Button btnSave;
+    private boolean boolIsUsed = false;
 
     private boolean checkShowBrandThread = false;
     private boolean checkInsertTagThread = false;
@@ -72,16 +69,18 @@ public class NFCActivity extends Activity {
     private boolean checkSelectPriceStock = false;
     private boolean checkUpdateProductInfo = false;
     private boolean checkSelectProductInfo = false;
+    private boolean checkIsUsed = false;
 
     private ThreadSelectAllBrand threadSelectAllBrand;
-    private ThreadInsertTag threadInsertTag;
+    private ThreadInsertTag threadInsertTag; // no array
     private ThreadSelectProductName threadSelectProductName;
     private ThreadSelectSerial threadSelectSerial;
     private ThreadSelectSize threadSelectSize;
     private ThreadSelectColor threadSelectColor;
     private ThreadSelectPriceStock threadSelectPriceStock;
-    private ThreadUpdateProductInfo threadUpdateProductInfo;
+    private ThreadUpdateProductInfo threadUpdateProductInfo; // no array
     private ThreadSelectProductInfo threadSelectProductInfo;
+    private ThreadSelectIsUsed threadSelectIsUsed;
 
     private AdapterView.OnItemSelectedListener onItemSelectedListenerBrand = new AdapterView.OnItemSelectedListener() {
 
@@ -327,13 +326,18 @@ public class NFCActivity extends Activity {
     protected void onNewIntent(Intent intent) {
 
         if (intent != null) {
-            processTag(intent); // processTag 메소드 호출
+            try {
+                processTag(intent); // processTag 메소드 호출
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         super.onNewIntent(intent);
+
     }
 
     // onNewIntent 메소드 수행 후 호출되는 메소드
-    private void processTag(Intent intent) {
+    private void processTag(Intent intent) throws InterruptedException {
 
         // EditText에 입력된 값이 있는지 없는지 알기 위한 변수
         //String s_url = url.getText().toString();
@@ -372,7 +376,7 @@ public class NFCActivity extends Activity {
     }
 
     // 감지된 태그에 NdefMessage를 쓰는 메소드
-    public boolean writeTag(NdefMessage message, Tag tag) {
+    public boolean writeTag(NdefMessage message, Tag tag) throws InterruptedException {
 
         // 메시지의 byte크기를 얻어옴
         int size = message.toByteArray().length;
@@ -421,14 +425,14 @@ public class NFCActivity extends Activity {
 
                 byte[] tagId = tag.getId();
                 // 이 부분 주석 안하면 tag read시 에러남
-                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
                 tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
 
                 //threadTest(); // test 중
 
-                // 브랜드 가져온다
                 execForUnusedTagThread();
 
 
@@ -459,15 +463,27 @@ public class NFCActivity extends Activity {
                 Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
 
                 tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(), "쓰기 성공!", Toast.LENGTH_SHORT).show();
 
                 // 최초일 때만 InsertTag
 
                 //threadTest(); // test 중
 
+                threadSelectIsUsed = new ThreadSelectIsUsed();
+
+                threadSelectIsUsed.start();
+                threadSelectIsUsed.join();
+
                 // 브랜드 가져온다
-                execForUsedTagThread();
+                if(boolIsUsed == true) { // used가 1이면
+                    Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+                    execForUsedTagThread();
+                }
+                else { // used가 0이면
+                    Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+                    execForUnusedTagThread();
+                }
                 //execInitThread();
 
                 // 읽기 전용 checkbox 체크시
@@ -550,17 +566,18 @@ public class NFCActivity extends Activity {
                 Handler handler = new Handler(Looper.getMainLooper());
                 String tagId = tvTagId.getText().toString(); // tagId 가져온다
 
-                final HashMap<String, String>[] result = nfcDao.insertTag(tagId);
+                final HashMap<String, String> result = nfcDao.insertTag(tagId);
 
-                if(result[0].get("status") == "OK") {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            //printToastInThread("insertTag Success");
-                        }
-                    });
-                }
-                else {
-                    printToastInThread("insertTag Fail");
+                if(result != null) {
+                    if (result.get("status") == "OK") {
+                        handler.post(new Runnable() {
+                            public void run() {
+                                printToastInThread("insertTag Success" + " Message : " + result.get("message"));
+                            }
+                        });
+                    } else {
+                        printToastInThread("insertTag Fail" + " Message : " + result.get("message"));
+                    }
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -584,7 +601,7 @@ public class NFCActivity extends Activity {
                 //hashMapBrandList = result;
                 ArrayList<String> itemList = null;
                 itemList = new ArrayList<String>();
-                //itemList.add(null);
+                itemList.add("");
 
                 for(int i = 0; i < result.length; i++)
                     Log.d("brand list", result[i].get("brand"));
@@ -602,12 +619,14 @@ public class NFCActivity extends Activity {
                         android.R.layout.simple_spinner_item, itemList);
                 adapterBrand.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                handler.post(new Runnable() {
+                boolean post = handler.post(new Runnable() {
                     public void run() {
                         spinBrand.setAdapter(adapterBrand);
-                        if (!selectedBrand.equals(null) || !selectedBrand.equals("")) {
-                            int spinPosition = adapterBrand.getPosition(selectedBrand);
-                            spinBrand.setSelection(spinPosition);
+                        if (selectedBrand != null) {
+                            if (!selectedBrand.equals("")) {
+                                int spinPosition = adapterBrand.getPosition(selectedBrand);
+                                spinBrand.setSelection(spinPosition);
+                            }
                         }
                         //spinBrand.setSelection(null);
                     }
@@ -652,12 +671,16 @@ public class NFCActivity extends Activity {
                             android.R.layout.simple_spinner_item, itemList);
                     adapterProductName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+                    Log.d("ThreadSelectProductName", "executed 1");
+
                     handler.post(new Runnable() {
                         public void run() {
                             spinProductName.setAdapter(adapterProductName);
-                            if (!selectedProductName.equals(null) || !selectedProductName.equals("")) {
-                                int spinPosition = adapterProductName.getPosition(selectedProductName);
-                                spinProductName.setSelection(spinPosition);
+                            if(selectedProductName != null) {
+                                if (!selectedProductName.equals("")) {
+                                    int spinPosition = adapterProductName.getPosition(selectedProductName);
+                                    spinProductName.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -717,9 +740,11 @@ public class NFCActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinSerial.setAdapter(adapterSerial);
-                            if (!selectedSerial.equals(null) || !selectedSerial.equals("")) {
-                                int spinPosition = adapterSerial.getPosition(selectedSerial);
-                                spinSerial.setSelection(spinPosition);
+                            if(selectedSerial != null) {
+                                if (!selectedSerial.equals("")) {
+                                    int spinPosition = adapterSerial.getPosition(selectedSerial);
+                                    spinSerial.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -777,9 +802,11 @@ public class NFCActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinSize.setAdapter(adapterSize);
-                            if (!selectedSize.equals(null) || !selectedSize.equals("")) {
-                                int spinPosition = adapterSize.getPosition(selectedSize);
-                                spinSize.setSelection(spinPosition);
+                            if(selectedSize != null) {
+                                if (!selectedSize.equals("")) {
+                                    int spinPosition = adapterSize.getPosition(selectedSize);
+                                    spinSize.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -836,9 +863,11 @@ public class NFCActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinColor.setAdapter(adapterColor);
-                            if (!selectedColor.equals(null) || !selectedColor.equals("")) {
-                                int spinPosition = adapterColor.getPosition(selectedColor);
-                                spinColor.setSelection(spinPosition);
+                            if(selectedColor != null) {
+                                if (!selectedColor.equals("")) {
+                                    int spinPosition = adapterColor.getPosition(selectedColor);
+                                    spinColor.setSelection(spinPosition);
+                                }
                             }
                         }
                     });
@@ -879,13 +908,14 @@ public class NFCActivity extends Activity {
                 String stock = null;
                 String price = null;
 
-                for(HashMap<String, String> hashMap : result) {
-                    if (hashMap.get("status") == "OK") {
-                        stock = hashMap.get("stock"); // 브랜드 리스트
-                        price = hashMap.get("price"); // 브랜드 리스트
-                    }
-                    else {
-                        printToastInThread("selectColor Fail");
+                if(result != null) {
+                    for (HashMap<String, String> hashMap : result) {
+                        if (hashMap.get("status") == "OK") {
+                            stock = hashMap.get("stock"); // 브랜드 리스트
+                            price = hashMap.get("price"); // 브랜드 리스트
+                        } else {
+                            printToastInThread("selectColor Fail");
+                        }
                     }
                 }
 
@@ -918,18 +948,19 @@ public class NFCActivity extends Activity {
                 Handler handler = new Handler(Looper.getMainLooper());
                 String tagId = tvTagId.getText().toString(); // tagId 가져온다
 
-                final HashMap<String, String>[] result = nfcDao.updateProductInfo(tagId,
+                final HashMap<String, String> result = nfcDao.updateProductInfo(tagId,
                         selectedBrand, selectedSerial, selectedSize, selectedColor);
 
-                if(result[0].get("status") == "OK") {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            printToastInThread("productInfo save Success");
-                        }
-                    });
-                }
-                else {
-                    printToastInThread("Fail");
+                if(result != null) {
+                    if (result.get("status") == "OK") {
+                        handler.post(new Runnable() {
+                            public void run() {
+                            printToastInThread("productInfo save Success" + " Message : " + result.get("message"));
+                            }
+                        });
+                    } else {
+                        printToastInThread("productInfo save Fail" + " Message : " + result.get("message"));
+                    }
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -951,7 +982,7 @@ public class NFCActivity extends Activity {
 
                 final HashMap<String, String>[] result = nfcDao.selectProductInfo(tagId);
 
-                printToastInThread("ThreadSelectProductInfo In");
+                //printToastInThread("ThreadSelectProductInfo In");
 
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
@@ -963,7 +994,7 @@ public class NFCActivity extends Activity {
                             selectedBrand = hashMap.get("brand");
                             setTextView(hashMap.get("price"), tvPrice);
                             setTextView(hashMap.get("stock"), tvStock);
-                            printToastInThread("ThreadSelectProductInfo Success");
+                            //printToastInThread("ThreadSelectProductInfo Success");
                         } else {
                             printToastInThread("ThreadSelectProductInfo Fail");
                         }
@@ -989,6 +1020,41 @@ public class NFCActivity extends Activity {
                 e.printStackTrace();
             }
             checkSelectProductInfo = true;
+        }
+    }
+
+    class ThreadSelectIsUsed extends Thread {
+        @Override
+        public void run() {
+            try {
+                // Looper.getMainLooper() : main UI 접근하기 위함
+                // main UI 내의 요소를 변경하기 위한 핸들러
+                Handler handler = new Handler(Looper.getMainLooper());
+                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+
+                final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
+
+                //printToastInThread("ThreadSelectIsUsed In");
+
+                if(result != null) {
+                    for (HashMap<String, String> hashMap : result) {
+                        if (hashMap.get("status") == "OK") {
+                            //printToastInThread("ThreadSelectIsUsed Success");
+                            if(hashMap.get("used").equals("1"))
+                                boolIsUsed = true;
+                            else
+                                boolIsUsed = false;
+                        } else {
+                            printToastInThread("ThreadSelectIsUsed Fail");
+                        }
+                    }
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            checkIsUsed = true;
         }
     }
 
@@ -1072,8 +1138,8 @@ public class NFCActivity extends Activity {
             threadSelectProductInfo.interrupt();
         }
 
-        threadInsertTag = new ThreadInsertTag();
-        threadInsertTag.start();
+//        threadInsertTag = new ThreadInsertTag();
+//        threadInsertTag.start();
 
         threadSelectAllBrand = new ThreadSelectAllBrand();
         threadSelectAllBrand.start();
@@ -1174,6 +1240,5 @@ public class NFCActivity extends Activity {
         tvStock.setText(stock);
     }
     */
-
 
 }
