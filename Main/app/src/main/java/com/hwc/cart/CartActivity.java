@@ -1,16 +1,21 @@
 package com.hwc.cart;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hwc.main.R;
+import com.hwc.res.ResActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +59,7 @@ public class CartActivity extends Activity {
     public ListView list;
 
     public Button btnSend;
+    public Button bt_request;
     public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
     public Bitmap btp_test;
     public ImageView img_test;
@@ -71,6 +77,13 @@ public class CartActivity extends Activity {
 
         //cartList = new ArrayList<>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/cart.php");
+
+        bt_request = (Button) findViewById(R.id.bt_request);
+        bt_request.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                cfrmDialog();
+            }
+        });
     }
 
     public void showList() {
@@ -158,5 +171,82 @@ public class CartActivity extends Activity {
                 finish();
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void getCfrmRequest(String url) {
+        class GetDataJSON extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params) {
+                String uri = params[0];
+                BufferedReader bufferedReader = null;
+                try {
+                    URL url = new URL(uri);
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    StringBuilder sb = new StringBuilder();
+
+                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                    String json;
+                    while ((json = bufferedReader.readLine()) != null) {
+                        sb.append(json + "\n");
+                    }
+
+                    return sb.toString().trim();
+
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                myJSON = result;
+            }
+        }
+        GetDataJSON g = new GetDataJSON();
+        g.execute(url);
+    }
+
+
+    public void cfrmDialog() {
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+        alertDlg.setIcon(R.mipmap.ic_launcher);
+        alertDlg.setMessage("결제하시겠습니까?");
+        alertDlg.setNegativeButton("취소",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+        alertDlg.setPositiveButton("확인",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        AlertDialog.Builder alertDlg = new AlertDialog.Builder(CartActivity.this);
+                        alertDlg.setIcon(R.mipmap.ic_launcher);
+                        alertDlg.setMessage("결제가 완료되었습니다. 구매 목록에서 확인하세요.");
+                        alertDlg.setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int whichButton) {
+                                        /*php 불러옴*/
+                                        getCfrmRequest("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/paid/paid.php");
+                                        /*Activity는 여기서 바꾸면 됨*/
+                                        Intent intent = new Intent(CartActivity.this, ResActivity.class);
+                                        startActivity(intent);
+                                    }
+                                });
+                        AlertDialog alert = alertDlg.create();
+                        alert.setTitle("깃털쇼핑_1조");
+                        alert.show();
+                    }
+                });
+        AlertDialog alert = alertDlg.create();
+        alert.setTitle("깃털쇼핑_1조");
+        alert.show();
     }
 }
