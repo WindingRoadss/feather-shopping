@@ -116,7 +116,6 @@ public class CartActivity extends Activity {
                     return null;
                 }
 
-
             }
 
             @Override

@@ -266,6 +266,7 @@ public class NFCDao {
         resultTags.add("brand");
         resultTags.add("price");
         resultTags.add("stock");
+        resultTags.add("image");
         HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
         return result;
     }

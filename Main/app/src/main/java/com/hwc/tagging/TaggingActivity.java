@@ -3,6 +3,7 @@ package com.hwc.tagging;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -20,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +60,9 @@ public class TaggingActivity extends Activity {
     private String selectedSize;
     private String selectedColor;
     private String selectedCount;
+    private String selectedProductImage;
+
+    private Bitmap bitmapSelectedPrImage;
 
     private String userId = "LDCC1"; // test용
 
@@ -66,6 +71,7 @@ public class TaggingActivity extends Activity {
     private Spinner spinSize, spinColor;
     //private EditText edtRequestCount;
     private TextView tvRequestCount;
+    private ImageView ivSelectedPrImage;
 
     private Button btnPaying, btnCart, btnIncPrCount, btnDecPrCount;
     private final Integer MAX_COUNT = 20;
@@ -90,6 +96,7 @@ public class TaggingActivity extends Activity {
     private ThreadInsertProductIntoCart threadInsertProductIntoCart;
     private ThreadInsertProductPaying threadInsertProductPaying;
     private ThreadSelectIsUsed threadSelectIsUsed;
+    private ThreadLoadProductImage threadLoadProductImage;
 
 //    private TextWatcher twTotalPriceCalculator;
 //
@@ -280,6 +287,8 @@ public class TaggingActivity extends Activity {
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
         spinSize.setOnItemSelectedListener(onItemSelectedListenerSize);
 
+        ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
+
 //        twTotalPriceCalculatorGenerator();
 //        edtRequestCount.addTextChangedListener(twTotalPriceCalculator);
 
@@ -371,6 +380,7 @@ public class TaggingActivity extends Activity {
                 else { // used가 0이면
                     Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
                     execSelectProductInfoThread();
+                    ivSelectedPrImage.setImageResource(android.R.color.transparent);
                     // 상품 정보 보여준 것 초기화
                     tvRequestCount.setText("1");
                     tvBrand.setText("");
@@ -449,6 +459,7 @@ public class TaggingActivity extends Activity {
                             selectedSize = hashMap.get("size");
                             selectedProductName = hashMap.get("name");
                             selectedBrand = hashMap.get("brand");
+                            selectedProductImage = hashMap.get("image");
                             setTextView(hashMap.get("serial"), tvSerial);
 //                            setTextView(hashMap.get("color"), tvColor);
 //                            setTextView(hashMap.get("size"), tvSize);
@@ -789,6 +800,24 @@ public class TaggingActivity extends Activity {
         }
     }
 
+    // 이미지 불러와준다
+    class ThreadLoadProductImage extends Thread {
+        @Override
+        public void run() {
+            // Looper.getMainLooper() : main UI 접근하기 위함
+            // main UI 내의 요소를 변경하기 위한 핸들러
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            bitmapSelectedPrImage = commonDao.loadBitmap(selectedProductImage);
+
+            handler.post(new Runnable() {
+                public void run() {
+                    ivSelectedPrImage.setImageBitmap(bitmapSelectedPrImage);
+                }
+            });
+        }
+    }
+
     public void printToastInThread(final String message) {
         Handler mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(new Runnable() {
@@ -812,9 +841,11 @@ public class TaggingActivity extends Activity {
     public void execSelectProductInfoThread() throws InterruptedException {
 
         threadSelectProductInfo = new ThreadSelectProductInfo();
-
         threadSelectProductInfo.start();
         threadSelectProductInfo.join(); // threadSelectProductInfo가 끝날 때까지 기다림
+
+        threadLoadProductImage = new ThreadLoadProductImage(); // 상품 이미지 불러온다
+        threadLoadProductImage.start();
 
         Log.d("cart insert", "threadSelectProductInfo killed");
 

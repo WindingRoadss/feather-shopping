@@ -2,21 +2,30 @@ package com.hwc.nfc;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,9 +35,13 @@ import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.main.R;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.apache.http.client.ClientProtocolException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -43,6 +56,16 @@ public class NFCActivity extends Activity {
     private CommonDao commonDao;
     private NFCDao nfcDao;
 
+    private int PICK_IMAGE_REQUEST = 1;
+    public static final String UPLOAD_KEY = "image";
+    ProgressDialog prgDialog;
+    String encodedString;
+    RequestParams params = new RequestParams();
+    String imgPath, fileName;
+    Bitmap bitmap;
+    private static int RESULT_LOAD_IMG = 1;
+    //public static final String TAG = "MY MESSAGE";
+
     //EditText url;           // url 입력 받는 부분
     //EditText aar;           // AAR 입력 받는 부분
     /* branch test */
@@ -53,10 +76,15 @@ public class NFCActivity extends Activity {
     private String selectedSerial = null;
     private String selectedSize = null;
     private String selectedColor = null;
+    private String selectedProductImage = null;
+    private Uri uriSelecteProductImage = null;
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
-    private Button btnSave;
+    private Button btnSave, btnShowSelectedPrImage, btnUploadSelectedPrImage;
+    private ImageView ivSelectedPrImage;
+    private Bitmap bitmapSelectedPrImage;
+
     private boolean boolIsUsed = false;
 
     private boolean checkShowBrandThread = false;
@@ -81,6 +109,7 @@ public class NFCActivity extends Activity {
     private ThreadUpdateProductInfo threadUpdateProductInfo; // no array
     private ThreadSelectProductInfo threadSelectProductInfo;
     private ThreadSelectIsUsed threadSelectIsUsed;
+    private ThreadLoadProductImage threadLoadProductImage;
 
     private AdapterView.OnItemSelectedListener onItemSelectedListenerBrand = new AdapterView.OnItemSelectedListener() {
 
@@ -250,6 +279,73 @@ public class NFCActivity extends Activity {
         }
     };
 
+    View.OnClickListener onClickListenerShowPrImage = new View.OnClickListener(){
+        public void onClick(View v) {
+
+            if (commonDao.isNetworkAvailable()) {
+                Toast.makeText(getBaseContext(), "갤러리로 연결합니다", Toast.LENGTH_SHORT).show();
+                //int PICK_IMAGE_REQUEST = 1;
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            }
+            else {
+                Toast.makeText(getBaseContext(), "네트워크 연결 상태를 확인하세요", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    View.OnClickListener onClickListenerUploadPrImage = new View.OnClickListener(){
+        public void onClick(View v) {
+
+            if (commonDao.isNetworkAvailable()) {
+                Toast.makeText(getBaseContext(), "업로드 테스트 중", Toast.LENGTH_SHORT).show();
+                uploadImage();
+            }
+            else {
+                Toast.makeText(getBaseContext(), "네트워크 연결 상태를 확인하세요", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            //filePath = data.getData();
+            uriSelecteProductImage = data.getData();
+            //bitmapSelectedPrImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uriSelecteProductImage);
+            //ivSelectedPrImage.setImageBitmap(bitmapSelectedPrImage);
+
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            // Get the cursor
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            // Move to first row
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            imgPath = cursor.getString(columnIndex);
+            cursor.close();
+            ImageView imgView = (ImageView) findViewById(R.id.ivSelectedPrImage);
+            // Set the Image in ImageView
+            imgView.setImageBitmap(BitmapFactory
+                    .decodeFile(imgPath));
+            // Get the Image's file name
+            String fileNameSegments[] = imgPath.split("/");
+            fileName = fileNameSegments[fileNameSegments.length - 1];
+            // Put file name in Async Http Post Param which will used in Php web app
+            params.put("filename", fileName);
+        }
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc);
@@ -269,6 +365,10 @@ public class NFCActivity extends Activity {
         tvPrice = (TextView) findViewById(R.id.tvPrice);
         tvStock = (TextView) findViewById(R.id.tvStock);
         btnSave = (Button)findViewById(R.id.btnSave);
+        btnShowSelectedPrImage = (Button) findViewById(R.id.btnShowSelectedPrImage);
+        btnUploadSelectedPrImage = (Button) findViewById(R.id.btnUploadSelectedPrImage);
+
+        ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
         // 입력할 url, aar
         url = "url";
@@ -281,6 +381,8 @@ public class NFCActivity extends Activity {
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
 
         btnSave.setOnClickListener(onClickListenerSave);
+        btnShowSelectedPrImage.setOnClickListener(onClickListenerShowPrImage);
+        btnUploadSelectedPrImage.setOnClickListener(onClickListenerUploadPrImage);
 
         //disableSpinner(spinBrand);
         //disableSpinner(spinProductName);
@@ -1002,6 +1104,7 @@ public class NFCActivity extends Activity {
                             selectedSize = hashMap.get("size");
                             selectedProductName = hashMap.get("name");
                             selectedBrand = hashMap.get("brand");
+                            selectedProductImage = hashMap.get("image");
                             setTextView(hashMap.get("price"), tvPrice);
                             setTextView(hashMap.get("stock"), tvStock);
                             //printToastInThread("ThreadSelectProductInfo Success");
@@ -1068,6 +1171,23 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 이미지 불러와준다
+    class ThreadLoadProductImage extends Thread {
+        @Override
+        public void run() {
+            // Looper.getMainLooper() : main UI 접근하기 위함
+            // main UI 내의 요소를 변경하기 위한 핸들러
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            bitmapSelectedPrImage = commonDao.loadBitmap(selectedProductImage);
+
+            handler.post(new Runnable() {
+                public void run() {
+                    ivSelectedPrImage.setImageBitmap(bitmapSelectedPrImage);
+                }
+            });
+        }
+    }
 
     public void printToastInThread(final String message) {
         Handler mHandler = new Handler(Looper.getMainLooper());
@@ -1107,6 +1227,7 @@ public class NFCActivity extends Activity {
                 selectedSerial = null;
                 selectedSize = null;
                 selectedColor = null;
+                ivSelectedPrImage.setImageResource(android.R.color.transparent); // 이미지 투명으로 없앤다
 
                 deleteItemsInSpin(spinProductName); // Item delete
                 deleteItemsInSpin(spinSerial); // Item delete
@@ -1132,9 +1253,11 @@ public class NFCActivity extends Activity {
     public void execForUsedTagThread() throws InterruptedException {
 
         threadSelectProductInfo = new ThreadSelectProductInfo();
-
         threadSelectProductInfo.start();
         threadSelectProductInfo.join(); // threadSelectProductInfo가 끝날 때까지 기다림
+
+        threadLoadProductImage = new ThreadLoadProductImage(); // 상품 이미지 불러온다
+        threadLoadProductImage.start();
 
         // 최초일 때만 InsertTag
         if (checkInsertTagThread == true) {
@@ -1271,5 +1394,178 @@ public class NFCActivity extends Activity {
         tvStock.setText(stock);
     }
     */
+    /*
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private void uploadImage(){
+        class UploadImage extends AsyncTask<Bitmap,Void,String> {
+
+            ProgressDialog loading;
+            //RequestHandler rh = new RequestHandler();
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(NFCActivity.this, "Uploading Image", "Please wait...",true,true);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected String doInBackground(Bitmap... params) {
+                Bitmap bitmap = params[0];
+                String uploadImage = getStringImage(bitmap);
+
+                printToastInThread(uploadImage);
+
+                HashMap<String,String> data = new HashMap<>();
+                data.put(UPLOAD_KEY, uploadImage);
+
+                // String result = commonDao.sendPostRequest(UPLOAD_URL,data);
+                // pkPath
+                // String pkPath = "/images/php/tagging/insertToPaidCart.php";
+                String result = commonDao.sendPostRequest(data);
+
+                return result;
+            }
+        }
+
+        UploadImage ui = new UploadImage();
+        ui.execute(bitmapSelectedPrImage); // 실제 thread 실행
+    }
+    */
+
+    // When Upload button is clicked
+    public void uploadImage() {
+        // When Image is selected from Gallery
+
+        //imgPath = uriSelecteProductImage.toString();
+        //fileName = "test중";
+
+        if (imgPath != null && !imgPath.isEmpty()) {
+            //prgDialog.setMessage("Converting Image to Binary Data");
+            //prgDialog.show();
+            // Convert image to String using Base64
+            encodeImagetoString();
+            // When Image is not selected from Gallery
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "You must select image from gallery before you try to upload",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // AsyncTask - To convert Image to String
+    public void encodeImagetoString() {
+        new AsyncTask<Void, Void, String>() {
+
+            protected void onPreExecute() {
+
+            };
+
+            @Override
+            protected String doInBackground(Void... params) {
+                BitmapFactory.Options options = null;
+                options = new BitmapFactory.Options();
+                options.inSampleSize = 3;
+                bitmap = BitmapFactory.decodeFile(imgPath,
+                        options);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                // Must compress the Image to reduce image size to make upload easy
+                bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                byte[] byte_arr = stream.toByteArray();
+                // Encode Image to String
+                encodedString = Base64.encodeToString(byte_arr, 0);
+                return "";
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                //prgDialog.setMessage("Calling Upload");
+                // Put converted Image string into Async Http Post param
+                params.put("image", encodedString);
+                // Trigger Image upload
+                triggerImageUpload();
+            }
+        }.execute(null, null, null);
+    }
+
+    public void triggerImageUpload() {
+        makeHTTPCall();
+    }
+
+    // Make Http call to upload Image to Php server
+    public void makeHTTPCall() {
+        //prgDialog.setMessage("Invoking Php");
+        AsyncHttpClient client = new AsyncHttpClient();
+        // Don't forget to change the IP address to your LAN address. Port no as well.
+        client.post("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/NFC/addImage.php",
+        params, new AsyncHttpResponseHandler() {
+            // When the response returned by REST has Http
+            // response code '200'
+            @Override
+            public void onSuccess(String response) {
+                // Hide Progress Dialog
+                //prgDialog.hide();
+                Toast.makeText(getApplicationContext(), "onSucceess In",
+                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), response,
+                        Toast.LENGTH_LONG).show();
+            }
+
+            // When the response returned by REST has Http
+            // response code other than '200' such as '404',
+            // '500' or '403' etc
+            @Override
+            public void onFailure(int statusCode, Throwable error,
+                                  String content) {
+                // Hide Progress Dialog
+                //prgDialog.hide();
+                // When Http response code is '404'
+                if (statusCode == 404) {
+                    Toast.makeText(getApplicationContext(),
+                            "Requested resource not found",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if (statusCode == 500) {
+                    Toast.makeText(getApplicationContext(),
+                            "Something went wrong at server end",
+                            Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "Error Occured n Most Common Error: n1. Device not connected to Internetn2. Web App is not deployed in App servern3. App server is not runningn HTTP Status code : "
+                                    + statusCode, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        // Dismiss the progress bar when application is closed
+        if (prgDialog != null) {
+            //prgDialog.dismiss();
+        }
+    }
+
 
 }

@@ -233,5 +233,12 @@
         android:layout_alignRight="@+id/tvRequestCount"
         android:layout_alignEnd="@+id/tvRequestCount" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_black"
+        android:id="@+id/ivSelectedPrImage"
+        android:layout_below="@+id/btnCart" />
+
 
 </RelativeLayout>
