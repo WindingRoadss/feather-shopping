@@ -46,13 +46,14 @@ public class SelectActivity extends Activity {
             }
         });
 
-        Button btnPaid = (Button) findViewById(R.id.btnPaid);
-        btnPaid.setOnClickListener(new View.OnClickListener() {
+        Button btnPaying = (Button) findViewById(R.id.btnPaid);
+        btnPaying.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getBaseContext(), PaidActivity.class);
                 startActivity(intent);
             }
         });
+
     }
 }

@@ -10,14 +10,16 @@ public class ListView_getset {
     private String brand;
     private String image;
     private String price;
+    private String snum;
 
-    ListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price) {
+    ListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price, String _snum) {
         name = _name;
         size = _size;
         color = _color;
         brand = _brand;
         image = _image;
         price = _price;
+        snum = _snum;
     }
 
 
@@ -43,5 +45,9 @@ public class ListView_getset {
 
     public String getPrice() {
         return price;
+    }
+
+    public String getSnum() {
+        return snum;
     }
 }

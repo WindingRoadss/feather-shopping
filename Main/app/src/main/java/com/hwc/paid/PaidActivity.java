@@ -1,12 +1,14 @@
 package com.hwc.paid;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -47,19 +49,12 @@ public class PaidActivity extends Activity {
     public ArrayList<String> data_brand = new ArrayList<>();
     public ArrayList<String> data_image = new ArrayList<>();
     public ArrayList<String> data_price = new ArrayList<>();
-    public static ArrayList<Integer> data_intprice = new ArrayList<>();
-    public ArrayList<Boolean> data_checked = new ArrayList<>();
-
+    public Button bt_bring;
+    public Button bt_delivery;
     public static JSONArray paid = null;
     public ListView list;
 
-    public Button btnSend;
-    public String imgUrl = "http://theopentutorials.com/totwp331/wp-content/uploads/totlogo.png";
-    public Bitmap btp_test;
-    public ImageView img_test;
-
     public static TextView txt_intprice;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +62,61 @@ public class PaidActivity extends Activity {
         setContentView(R.layout.activity_paid);
 
         txt_intprice = (TextView) findViewById(R.id.txt_intprice);
+        bt_bring = (Button) findViewById(R.id.bt_bring);
+        bt_delivery = (Button) findViewById(R.id.bt_delivery);
         //txt_intprice.setText("가격 : 테스트중");
 
         //cartList = new ArrayList<>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/paid/paid.php");
+        bt_bring.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (adapter.flag == false) {
+                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(PaidActivity.this);
+                    alertDlg.setIcon(R.mipmap.ic_launcher);
+                    alertDlg.setMessage("체크된 상품이 없습니다.");
+                    alertDlg.setPositiveButton("확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = alertDlg.create();
+                    alert.setTitle("깃털쇼핑_1조");
+                    alert.show();
+                }
+                if (adapter.flag == true) {
+                    askBringDialog();
+                }
+            }
+        });
+
+        bt_delivery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (adapter.flag == false) {
+                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(PaidActivity.this);
+                    alertDlg.setIcon(R.mipmap.ic_launcher);
+                    alertDlg.setMessage("체크된 상품이 없습니다.");
+                    alertDlg.setPositiveButton("확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = alertDlg.create();
+                    alert.setTitle("깃털쇼핑_1조");
+                    alert.show();
+                }
+                if (adapter.flag == true) {
+                    askDeliveryDialog();
+                }
+            }
+        });
     }
 
     public void showList() {
@@ -90,15 +136,8 @@ public class PaidActivity extends Activity {
                 data_brand.add(c.getString(TAG_BRAND));
                 data_image.add(c.getString(TAG_IMAGE));
                 data_price.add(c.getString(TAG_PRICE));
-
-                data_intprice.add(Integer.parseInt(data_price.get(i)));
-                //price_sum += data_intprice.get(i);
             }
-            //Log.d(HWC, "data_image의 주소 : " + data_image);
 
-            //Log.d(HWC, "price_sum의 값 : " + adapter.price_sum);
-
-            txt_intprice.setText("가격 : " + Integer.toString(adapter.price_sum));
 
             for (int i = 0; i < paid.length(); i++) {
                 PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i));
@@ -109,10 +148,6 @@ public class PaidActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    static public void setTextPrice(final int input) {
-        txt_intprice.setText("가격 : " + Integer.toString(input));
     }
 
     public void getData(String url) {
@@ -154,9 +189,65 @@ public class PaidActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                adapter.price_sum = 0;
                 finish();
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void askBringDialog() {
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(PaidActivity.this);
+        alertDlg.setIcon(R.mipmap.ic_launcher);
+        alertDlg.setMessage("수령하시겠습니까?");
+        alertDlg.setNegativeButton("취소",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+        alertDlg.setPositiveButton("확인",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        for (int i = 0; i < paid.length(); i++) {
+                            if (PaidListView_custom.data_checked.get(i) == true) {
+                                Log.d(HWC, i + "번째");
+                                adapter.txt_yesorno[i].setText("처리 완료");
+                                //PaidListView_custom.data_yestxt.set(i, "처리 완료");
+                            }
+                            //Log.d(HWC, "" + adapter.data_yestxt.get(i));
+                        }
+                    }
+                });
+        AlertDialog alert = alertDlg.create();
+        alert.setTitle("깃털쇼핑_1조");
+        alert.show();
+    }
+
+    public void askDeliveryDialog() {
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(PaidActivity.this);
+        alertDlg.setIcon(R.mipmap.ic_launcher);
+        alertDlg.setMessage("배송으로 받으시겠습니까?");
+        alertDlg.setNegativeButton("취소",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+        alertDlg.setPositiveButton("확인",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        // 이벤트 실행
+                    }
+                });
+        AlertDialog alert = alertDlg.create();
+        alert.setTitle("깃털쇼핑_1조");
+        alert.show();
     }
 }

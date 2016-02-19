@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,18 +15,21 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.hwc.dao.cart.CartDao;
 import com.hwc.main.R;
-import com.hwc.res.ResActivity;
+import com.hwc.paid.PaidActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * URL url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
@@ -39,21 +43,23 @@ public class CartActivity extends Activity {
 
     public static final String HWC = "HWC";
     public static final String TAG_RESULTS = "result";
-    // public static final String TAG_SNUM = "PR_SNUM";
     public static final String TAG_COLOR = "PR_COLOR";
     public static final String TAG_SIZE = "PR_SIZE";
     public static final String TAG_NAME = "PR_NAME";
     public static final String TAG_BRAND = "PR_BRAND";
     public static final String TAG_IMAGE = "PR_IMAGE";
     public static final String TAG_PRICE = "PR_PRICE";
+    public static final String TAG_SNUM = "PR_SNUM";
     public ArrayList<String> data_name = new ArrayList<>();
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
     public ArrayList<String> data_brand = new ArrayList<>();
     public ArrayList<String> data_image = new ArrayList<>();
     public ArrayList<String> data_price = new ArrayList<>();
+    public ArrayList<String> data_snum = new ArrayList<>();
     public static ArrayList<Integer> data_intprice = new ArrayList<>();
-    public ArrayList<Boolean> data_checked = new ArrayList<>();
+
+    private CartDao CartDao;
 
     public static JSONArray cart = null;
     public ListView list;
@@ -74,17 +80,47 @@ public class CartActivity extends Activity {
 
         txt_intprice = (TextView) findViewById(R.id.txt_intprice);
         //txt_intprice.setText("가격 : 테스트중");
-
+        CartDao = new CartDao();
         //cartList = new ArrayList<>();
         getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/cart.php");
 
         bt_request = (Button) findViewById(R.id.bt_request);
         bt_request.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                cfrmDialog();
+                if (adapter.flag2 == false) {
+                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(CartActivity.this);
+                    alertDlg.setIcon(R.mipmap.ic_launcher);
+                    alertDlg.setMessage("체크된 상품이 없습니다.");
+                    alertDlg.setPositiveButton("확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) {
+                                    // 이벤트 실행
+                                }
+                            });
+                    AlertDialog alert = alertDlg.create();
+                    alert.setTitle("깃털쇼핑_1조");
+                    alert.show();
+                }
+                if (adapter.flag2 == true) {
+                    cfrmDialog();
+                }
             }
         });
+
+/*        while(true) {
+            try {
+                Log.d(HWC, "Activity에서의 data_checked = " + data_checked);
+                Thread.sleep(3000);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }*/
     }
+
 
     public void showList() {
         try {
@@ -103,18 +139,19 @@ public class CartActivity extends Activity {
                 data_brand.add(c.getString(TAG_BRAND));
                 data_image.add(c.getString(TAG_IMAGE));
                 data_price.add(c.getString(TAG_PRICE));
+                data_snum.add(c.getString(TAG_SNUM));
 
                 data_intprice.add(Integer.parseInt(data_price.get(i)));
                 //price_sum += data_intprice.get(i);
             }
-            //Log.d(HWC, "data_image의 주소 : " + data_image);
+            Log.d(HWC, "data_price의 값 : " + data_price);
 
-            //Log.d(HWC, "price_sum의 값 : " + adapter.price_sum);
+            Log.d(HWC, "snum의 값 : " + data_snum);
 
             txt_intprice.setText("가격 : " + Integer.toString(adapter.price_sum));
 
             for (int i = 0; i < cart.length(); i++) {
-                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i));
+                ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i));
                 adapter.add(u);
             }
 
@@ -207,6 +244,27 @@ public class CartActivity extends Activity {
         g.execute(url);
     }
 
+    public void executeTheadTest() {
+        class TheadTest extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    insertPay();
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+
+            }
+        }
+        TheadTest theadTest = new TheadTest();
+        theadTest.execute();
+    }
 
     public void cfrmDialog() {
         AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
@@ -234,10 +292,13 @@ public class CartActivity extends Activity {
                                     public void onClick(DialogInterface dialog,
                                                         int whichButton) {
                                         /*php 불러옴*/
-                                        getCfrmRequest("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/paid/paid.php");
+                                        executeTheadTest();
+
+                                        //getCfrmRequest("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/insertToPaidCartFromCart.php");
                                         /*Activity는 여기서 바꾸면 됨*/
-                                        Intent intent = new Intent(CartActivity.this, ResActivity.class);
+                                        Intent intent = new Intent(CartActivity.this, PaidActivity.class);
                                         startActivity(intent);
+                                        finish();
                                     }
                                 });
                         AlertDialog alert = alertDlg.create();
@@ -249,4 +310,16 @@ public class CartActivity extends Activity {
         alert.setTitle("깃털쇼핑_1조");
         alert.show();
     }
+
+    public void insertPay() throws IOException {
+        HashMap<String, String>[] result = new HashMap[cart.length()];
+        //boolean queryResult = false;
+        for (int i = 0; i < cart.length(); i++) {
+            result[i] = new HashMap<String, String>();
+            //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
+            if (ListView_custom.data_checked.get(i) == true)
+                result[i] = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
+        }
+    }
 }
+

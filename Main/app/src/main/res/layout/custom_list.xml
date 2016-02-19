@@ -6,12 +6,13 @@
     android:padding="5dp">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingRight="10dp"
+        android:id="@+id/linearLayout">
 
 
         <TextView
@@ -66,13 +67,56 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center_horizontal">
+
         <CheckBox
             android:id="@+id/chk_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="구매" />
 
-    </LinearLayout>
+        <Button
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/bt_add"
+            android:textSize="15dp"
+            android:layout_alignTop="@+id/bt_minus"
+            android:layout_alignLeft="@+id/chk_add"
+            android:layout_alignStart="@+id/chk_add" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_eachsize"
+            android:text="0"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:layout_toRightOf="@+id/bt_add"
+            android:layout_toEndOf="@+id/bt_add"
+            android:layout_toLeftOf="@+id/bt_minus"
+            android:layout_marginTop="60dp"
+            android:layout_marginLeft="30dp" />
+
+        <Button
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:id="@+id/bt_minus"
+            android:textSize="15dp"
+            android:layout_below="@+id/chk_add"
+            android:layout_toRightOf="@+id/chk_add"
+            android:layout_toEndOf="@+id/chk_add" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>

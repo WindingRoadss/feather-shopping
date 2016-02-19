@@ -10,9 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.hwc.cart.CartActivity;
 import com.hwc.main.R;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Created by hyunwoo794 on 2016-01-18.
  */
 
-public class PaidListView_custom extends BaseAdapter implements View.OnClickListener {
+public class PaidListView_custom extends BaseAdapter {
     private PaidListView_custom mCustomAdapter = null;
     // Activity에서 가져온 객체정보를 저장할 변수
     public PaidListView_getset lv_gst;
@@ -33,24 +33,32 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
     public PaidActivity pa;
     public static final String HWC = "HWC";
     public static int price_sum = 0;
-
     // ListView 내부 View들을 가르킬 변수들
+
     public TextView txt_name;
     public TextView txt_size;
     public TextView txt_color;
     public TextView txt_brand;
     public TextView txt_price;
+    public TextView[] txt_yesorno = new TextView[pa.paid.length()];
     public ImageView img_test;
-    public CheckBox chk_add;
+
+    public CheckBox chk_cfrm;
     public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<PaidListView_getset> mData;
     public Bitmap btp_test;
+    public boolean flag = false;
+    public int get_position;
+    public static ArrayList<Boolean> data_checked = new ArrayList<>(PaidActivity.paid.length());
 
     public PaidListView_custom(Context context) {
         super();
         mContext = context;
         mData = new ArrayList<>();
+        for(int i=0;i<PaidActivity.paid.length();i++) {
+            data_checked.add(i,false);
+        }
     }
 
     @Override
@@ -99,17 +107,18 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
             txt_color = (TextView) v.findViewById(R.id.txt_color);
             txt_brand = (TextView) v.findViewById(R.id.txt_brand);
             txt_price = (TextView) v.findViewById(R.id.txt_price);
-            //url_image = (TextView) v.findViewById(R.id.url_image);
-            //btnSend = (Button) v.findViewById(R.id.bt_detail);
+            txt_yesorno[position] = (TextView) v.findViewById(R.id.txt_yesorno);
             img_test = (ImageView) v.findViewById(R.id.img_test);
-            chk_add = (CheckBox) v.findViewById(R.id.chk_add);
+            chk_cfrm = (CheckBox) v.findViewById(R.id.chk_cfrm);
+
         }
 
         // 받아온 position 값을 이용하여 배열에서 아이템을 가져온다.
         lv_gst = getItem(position);
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
-        chk_add.setTag(lv_gst);
+        chk_cfrm.setTag(lv_gst);
+        txt_yesorno[position].setTag(lv_gst);
 
         // 데이터의 실존 여부를 판별합니다.
         if (lv_gst != null) {
@@ -117,9 +126,9 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
             txt_name.setText(lv_gst.getName());
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
+            txt_yesorno[position].setText("처리 미완료");
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
-
             imageThread it = new imageThread();
             it.start();
             try {
@@ -134,14 +143,15 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
                 e.printStackTrace();
             }
 
-            chk_add.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            chk_cfrm.setChecked(((ListView) parent).isItemChecked(position));
+            chk_cfrm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
                     if (checked) {
-                        price_sum += pa.data_intprice.get(position);
-                        CartActivity.setTextPrice(price_sum);
+                        data_checked.set(position, true);
+                        flag = true;
                     } else {
-                        price_sum -= pa.data_intprice.get(position);
-                        CartActivity.setTextPrice(price_sum);
+                        data_checked.set(position, false);
+                        flag = false;
                     }
                 }
             });
@@ -155,37 +165,6 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
         mData.add(user);
     }
 
-    @Override
-    public void onClick(View v) {
-        // Tag를 이용하여 Data를 가져옵니다.
-        //ListView_getset clickItem = (ListView_getset) v.getTag();
-        /*switch (v.getId()) {
-            case R.id.chk_add:
-                for (int i = 0; i < ca.cart.length(); i++) {
-                    Log.d(HWC, "price_sum = " + price_sum + " data_intprice = " + ca.data_intprice);
-                    price_sum += ca.data_intprice.get(i);
-                }
-        }*/
-    }
-
-    /*
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            flag = true;
-            //Log.d(HWC, "" + ca.data_intprice);
-            for(int i = 0; i <ca.cart.length(); i++) {
-
-                    price_sum += ca.data_intprice.get(i);
-                    CartActivity.setTextPrice(price_sum);
-
-            }
-            //Log.d(HWC, "" + price_sum);
-        } else {
-            flag = false;
-            Log.d(HWC, "false");
-        }
-    }*/
 
     class imageThread extends Thread {
         @Override
@@ -204,4 +183,8 @@ public class PaidListView_custom extends BaseAdapter implements View.OnClickList
         }
     }
 
+    public class CustomViewHolder
+    {
+
+    }
 }
