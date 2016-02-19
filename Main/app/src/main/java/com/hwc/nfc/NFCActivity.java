@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
@@ -58,10 +59,12 @@ public class NFCActivity extends Activity {
 
     private int PICK_IMAGE_REQUEST = 1;
     public static final String UPLOAD_KEY = "image";
-    ProgressDialog prgDialog;
-    String encodedString;
-    RequestParams params = new RequestParams();
-    String imgPath, fileName;
+    //ProgressDialog prgDialog;
+
+    //String strImageEncoded;
+    //RequestParams params = new RequestParams();
+
+    String strImageEncoded, strSelecteProductImagPath = null, strSelecteProductImagName = null;
     Bitmap bitmap;
     private static int RESULT_LOAD_IMG = 1;
     //public static final String TAG = "MY MESSAGE";
@@ -77,7 +80,6 @@ public class NFCActivity extends Activity {
     private String selectedSize = null;
     private String selectedColor = null;
     private String selectedProductImage = null;
-    private Uri uriSelecteProductImage = null;
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
@@ -302,7 +304,7 @@ public class NFCActivity extends Activity {
 
             if (commonDao.isNetworkAvailable()) {
                 Toast.makeText(getBaseContext(), "업로드 테스트 중", Toast.LENGTH_SHORT).show();
-                uploadImage();
+                //uploadImage();
             }
             else {
                 Toast.makeText(getBaseContext(), "네트워크 연결 상태를 확인하세요", Toast.LENGTH_SHORT).show();
@@ -311,14 +313,14 @@ public class NFCActivity extends Activity {
         }
     };
 
+    // 갤러리에서 정보 가져온다
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
-            //filePath = data.getData();
-            uriSelecteProductImage = data.getData();
+            //strSelecteProductImagName = data.getData();
             //bitmapSelectedPrImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uriSelecteProductImage);
             //ivSelectedPrImage.setImageBitmap(bitmapSelectedPrImage);
 
@@ -326,23 +328,40 @@ public class NFCActivity extends Activity {
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
             // Get the cursor
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
             // Move to first row
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            imgPath = cursor.getString(columnIndex);
+            strSelecteProductImagPath = cursor.getString(columnIndex);
             cursor.close();
-            ImageView imgView = (ImageView) findViewById(R.id.ivSelectedPrImage);
+
+             ImageView imgView = (ImageView) findViewById(R.id.ivSelectedPrImage);
+            // imgView.setImageBitmap(BitmapFactory.decodeFile(strSelecteProductImagPath));
+
+            Bitmap unscaledBitmap = BitmapFactory.decodeFile(strSelecteProductImagPath);
+            Log.d("unscaled height", Integer.toString(unscaledBitmap.getHeight()));
+            Log.d("unscaled width", Integer.toString(unscaledBitmap.getWidth()));
+
+            int operandForResizeImg = getOperandForResizeImg(unscaledBitmap);
+            Bitmap scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, unscaledBitmap.getWidth() / operandForResizeImg,
+                    unscaledBitmap.getHeight() / operandForResizeImg, ScalingUtilities.ScalingLogic.FIT);
+            //Bitmap scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, imgView.getWidth(), imgView.getHeight(), ScalingUtilities.ScalingLogic.FIT);
+            Log.d("scaled height", Integer.toString(scaledBitmap.getHeight()));
+            Log.d("scaled width", Integer.toString(scaledBitmap.getWidth()));
+
+            imgView.setImageBitmap(scaledBitmap);
+
             // Set the Image in ImageView
-            imgView.setImageBitmap(BitmapFactory
-                    .decodeFile(imgPath));
+
             // Get the Image's file name
-            String fileNameSegments[] = imgPath.split("/");
-            fileName = fileNameSegments[fileNameSegments.length - 1];
+            String fileNameSegments[] = strSelecteProductImagPath.split("/");
+            strSelecteProductImagName = fileNameSegments[fileNameSegments.length - 1];
+
+            printToastInThread(strSelecteProductImagName);
             // Put file name in Async Http Post Param which will used in Php web app
-            params.put("filename", fileName);
+            // params.put("filename", strSelecteProductImagName);
+            strImageEncoded = encodeImagetoString(scaledBitmap); // String 형태로 변환된 이미지
         }
     }
 
@@ -1050,6 +1069,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 사진도 같이 업로드 해야 함
     class ThreadUpdateProductInfo extends Thread {
         @Override
         public void run() {
@@ -1059,9 +1079,21 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
                 String tagId = tvTagId.getText().toString(); // tagId 가져온다
+                String extName = null, noSpacePrName = null;
+
+
+                if(strSelecteProductImagName != null)
+                    extName = extractExtName(strSelecteProductImagName);
+                if(strSelecteProductImagName != null)
+                    noSpacePrName = convertStrNoSpace(selectedProductName);
+
+                //printToastInThread("blank : " + noSpacePrName);
+                // printToastInThread(selectedProductName);
+                // printToastInThread(extName);
 
                 final HashMap<String, String> result = nfcDao.updateProductInfo(tagId,
-                        selectedBrand, selectedSerial, selectedSize, selectedColor);
+                        selectedBrand, noSpacePrName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
+                        //selectedBrand, selectedProductName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
@@ -1382,6 +1414,38 @@ public class NFCActivity extends Activity {
         spinner.setEnabled(true);
     }
 
+    private String encodeImagetoString(Bitmap scaledBitmap) {
+        BitmapFactory.Options options = null;
+        options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
+        // bitmap = BitmapFactory.decodeFile(strSelecteProductImagPath, options);
+        // bitmap = scaledBitmap;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        // Must compress the Image to reduce image size to make upload easy
+        scaledBitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
+        byte[] byte_arr = stream.toByteArray();
+        // Encode Image to String
+        return Base64.encodeToString(byte_arr, 0);
+    }
+
+    private String extractExtName(String fileName) {
+        String extName = null;
+        extName = Files.getFileExtension(fileName);
+        return extName;
+    }
+
+    private String convertStrNoSpace(String productName) {
+        String noSpaceStr = productName.replace(" ", "");
+        return noSpaceStr;
+        //replaceAll("\\s", "")
+    }
+
+    private int getOperandForResizeImg(Bitmap bitmap) {
+        int maxHeight = 100;
+        int operand = operand = bitmap.getHeight() / maxHeight;
+        return operand;
+    }
+
     /*
     private void setAllSelectedData(String serial, String color, String size, String productName,
                                     String brand, String price, String stock) {
@@ -1394,6 +1458,7 @@ public class NFCActivity extends Activity {
         tvStock.setText(stock);
     }
     */
+
     /*
     public String getStringImage(Bitmap bmp){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1447,28 +1512,26 @@ public class NFCActivity extends Activity {
     */
 
     // When Upload button is clicked
+    /*
     public void uploadImage() {
         // When Image is selected from Gallery
 
-        //imgPath = uriSelecteProductImage.toString();
-        //fileName = "test중";
-
-        if (imgPath != null && !imgPath.isEmpty()) {
+        if (strSelecteProductImagPath != null && !strSelecteProductImagPath.isEmpty()) {
             //prgDialog.setMessage("Converting Image to Binary Data");
             //prgDialog.show();
             // Convert image to String using Base64
             encodeImagetoString();
             // When Image is not selected from Gallery
-        } else {
-            Toast.makeText(
-                    getApplicationContext(),
-                    "You must select image from gallery before you try to upload",
-                    Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText( getApplicationContext(), "You must select image from gallery before you try to upload", Toast.LENGTH_LONG).show();
         }
     }
+    */
 
     // AsyncTask - To convert Image to String
-    public void encodeImagetoString() {
+    /*
+    private String encodeImagetoString() {
         new AsyncTask<Void, Void, String>() {
 
             protected void onPreExecute() {
@@ -1480,14 +1543,13 @@ public class NFCActivity extends Activity {
                 BitmapFactory.Options options = null;
                 options = new BitmapFactory.Options();
                 options.inSampleSize = 3;
-                bitmap = BitmapFactory.decodeFile(imgPath,
-                        options);
+                bitmap = BitmapFactory.decodeFile(strSelecteProductImagPath, options);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 // Must compress the Image to reduce image size to make upload easy
                 bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
                 byte[] byte_arr = stream.toByteArray();
                 // Encode Image to String
-                encodedString = Base64.encodeToString(byte_arr, 0);
+                strImageEncoded = Base64.encodeToString(byte_arr, 0);
                 return "";
             }
 
@@ -1501,11 +1563,15 @@ public class NFCActivity extends Activity {
             }
         }.execute(null, null, null);
     }
+    */
 
+    /*
     public void triggerImageUpload() {
         makeHTTPCall();
     }
+    */
 
+    /*
     // Make Http call to upload Image to Php server
     public void makeHTTPCall() {
         //prgDialog.setMessage("Invoking Php");
@@ -1519,10 +1585,8 @@ public class NFCActivity extends Activity {
             public void onSuccess(String response) {
                 // Hide Progress Dialog
                 //prgDialog.hide();
-                Toast.makeText(getApplicationContext(), "onSucceess In",
-                        Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(), response,
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "onSucceess In", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
             }
 
             // When the response returned by REST has Http
@@ -1535,28 +1599,25 @@ public class NFCActivity extends Activity {
                 //prgDialog.hide();
                 // When Http response code is '404'
                 if (statusCode == 404) {
-                    Toast.makeText(getApplicationContext(),
-                            "Requested resource not found",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
                 }
                 // When Http response code is '500'
                 else if (statusCode == 500) {
-                    Toast.makeText(getApplicationContext(),
-                            "Something went wrong at server end",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
                 }
                 // When Http response code other than 404, 500
                 else {
-                    Toast.makeText(
-                            getApplicationContext(),
+                    Toast.makeText(getApplicationContext(),
                             "Error Occured n Most Common Error: n1. Device not connected to Internetn2. Web App is not deployed in App servern3. App server is not runningn HTTP Status code : "
-                                    + statusCode, Toast.LENGTH_LONG)
-                            .show();
+                                    + statusCode, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
+    */
 
+    /*
+    // progress bar 꺼지게 하는 곳
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
@@ -1566,6 +1627,7 @@ public class NFCActivity extends Activity {
             //prgDialog.dismiss();
         }
     }
+    */
 
 
 }

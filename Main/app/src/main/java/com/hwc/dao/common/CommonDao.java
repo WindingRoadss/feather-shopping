@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -203,7 +204,10 @@ public class CommonDao {
         // TODO Auto-generated method stub
         InputStream stream = null ;
         try {
-            URL url = new URL( $imagePath ) ;
+            Log.d("url encode", $imagePath);
+            //Log.d("url encode", URLEncoder.encode($imagePath, "utf-8"));
+            //URL url = new URL(URLEncoder.encode($imagePath, "utf-8"));
+            URL url = new URL($imagePath);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection() ;
             urlConnection.setRequestMethod( "GET" ) ;
             urlConnection.connect() ;
@@ -234,6 +238,9 @@ public class CommonDao {
         return (bm || bw || bx);
     }
 
+
+
+    /*
     public String sendGetRequest(String uri) {
         try {
             URL url = new URL(uri);
@@ -253,6 +260,7 @@ public class CommonDao {
             return null;
         }
     }
+    */
 
 
 

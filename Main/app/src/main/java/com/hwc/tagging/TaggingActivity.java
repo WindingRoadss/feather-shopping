@@ -169,7 +169,7 @@ public class TaggingActivity extends Activity {
             int count = Integer.valueOf(tvRequestCount.getText().toString());
             String tvStockStr = tvStock.getText().toString();
 
-            if(tvStockStr.equals(""))
+            if(tvStockStr.equals("") || tvStockStr.equals("null"))
                 maxProductCount = 1;
             else
                 maxProductCount = Integer.valueOf(tvStockStr);

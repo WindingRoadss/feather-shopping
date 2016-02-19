@@ -206,10 +206,10 @@ public class NFCDao {
         return result;
     }
 
-    public HashMap<String, String> updateProductInfo(String tagId, String brandName, String serial
-            , String size, String color) throws ClientProtocolException, IOException {
+    public HashMap<String, String> updateProductInfo(String tagId, String brandName, String productName, String serial
+            , String size, String color, String image, String extName) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
-        String paramURL = commonDao.getWebServerURL() + "/php/NFC/updateTagIdToSelectedProduct.php";
+        String paramURL = commonDao.getWebServerURL() + "/php/NFC/updateTagIdToSelectedProductWithImage.php";
 
 //        HttpPost request = makeHttpPost("id", id, "pwd", password,
 //                paramURL);
@@ -221,12 +221,18 @@ public class NFCDao {
         valueList.add(tagId);
         tagList.add("brand");
         valueList.add(brandName);
+        tagList.add("name");
+        valueList.add(productName);
         tagList.add("serial");
         valueList.add(serial);
         tagList.add("size");
         valueList.add(size);
         tagList.add("color");
         valueList.add(color);
+        tagList.add("image");
+        valueList.add(image);
+        tagList.add("extname");
+        valueList.add(extName);
 
         HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
         HttpClient client = new DefaultHttpClient();
