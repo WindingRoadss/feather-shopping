@@ -14,10 +14,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hwc.shared.LoginSession;
+
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends Activity {
     public EditText et_id;
@@ -28,12 +31,34 @@ public class MainActivity extends Activity {
     private ArrayList<String> arrayMemberIdName; //회원의 ID와 이름 저장
     private boolean mChecked = false;
 
+    // SharedPrefence를 위한 멤버 변수
+    private LoginSession loginSession;
+    private HashMap<String, String> infoList = new HashMap<String, String>();
+    private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ConnectDB.setActivity(this); // 네트워크 연결확인 하기 위한
         ConnectDB.deleteAllActList(); // 남아있는 activity 삭제하고 시작
+
+        loginSession = new LoginSession(getApplicationContext());
+        infoListFormPref = loginSession.getPreferencesResultHashMap();
+
+        String test = infoListFormPref.get("id");
+        Log.d("auto login", test);
+        Log.d("auto login size", Integer.toString(test.length()));
+
+        //loginSession.clearPreferences();
+
+        if(loginSession.getPreferencesResultHashMap().get("id").length() != 0) { // id가 10글자를 넘어가면
+            Log.d("auto login", loginSession.getPreferencesResultHashMap().get("id"));
+            Intent intent = new Intent(getBaseContext(), SelectActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
 
         bt_enter = (Button) findViewById(R.id.bt_enter);
         bt_enter.setOnClickListener(new View.OnClickListener() {
@@ -54,8 +79,8 @@ public class MainActivity extends Activity {
                 id = String.valueOf(et_id.getText());
                 et_password = (EditText) findViewById(R.id.et_password);
                 id = String.valueOf(et_id.getText());
-                if (ConnectDB.isNetworkAvailable()) {
 
+                if (ConnectDB.isNetworkAvailable()) {
                     t_login.start();
                     mProgress.dismiss();
                 } else
@@ -90,6 +115,13 @@ public class MainActivity extends Activity {
                     ConnectDB.setId(id);
                     ConnectDB.setName(arrayMemberIdName.get(1));
                     ConnectDB.setEmail(arrayMemberIdName.get(2));
+
+                    // SharedPreference
+                    infoList.put("id", id);
+                    loginSession = new LoginSession(getApplicationContext(), infoList);
+                    infoListFormPref = loginSession.getPreferencesResultHashMap();
+                    Log.d("shared pref", infoListFormPref.get("id"));
+
                     Intent intent = new Intent(getBaseContext(), SelectActivity.class);
                     startActivity(intent);
                 } else {

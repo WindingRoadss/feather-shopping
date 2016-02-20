@@ -3,6 +3,7 @@ package com.hwc.tagging;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -20,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,14 +60,24 @@ public class TaggingActivity extends Activity {
     private String selectedSize;
     private String selectedColor;
     private String selectedCount;
+    private String selectedProductImage;
+
+    private Bitmap bitmapSelectedPrImage;
 
     private String userId = "LDCC1"; // test용
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private TextView tvBrand, tvProductName, tvSerial; //tvSize, tvColor;
     private Spinner spinSize, spinColor;
-    private EditText edtRequestCount;
-    private Button btnPaying, btnCart;
+    //private EditText edtRequestCount;
+    private TextView tvRequestCount;
+    private ImageView ivSelectedPrImage;
+
+    private Button btnPaying, btnCart, btnIncPrCount, btnDecPrCount;
+    private final Integer MAX_COUNT = 20;
+    private int maxProductCount = 1;
+
+    private boolean boolIsUsed = false;
 
     private boolean checkSelectProductInfo = false;
     private boolean checkInsertProductIntoCart = false;
@@ -74,6 +86,7 @@ public class TaggingActivity extends Activity {
     private boolean checkSelectSize = false;
     private boolean checkSelectColor = false;
     private boolean checkSelectPriceStock = false;
+    private boolean checkIsUsed = false;
 
     private ThreadSelectSize threadSelectSize;
     private ThreadSelectColor threadSelectColor;
@@ -82,6 +95,8 @@ public class TaggingActivity extends Activity {
     private ThreadSelectProductInfo threadSelectProductInfo;
     private ThreadInsertProductIntoCart threadInsertProductIntoCart;
     private ThreadInsertProductPaying threadInsertProductPaying;
+    private ThreadSelectIsUsed threadSelectIsUsed;
+    private ThreadLoadProductImage threadLoadProductImage;
 
 //    private TextWatcher twTotalPriceCalculator;
 //
@@ -146,6 +161,32 @@ public class TaggingActivity extends Activity {
                 Toast.makeText(getBaseContext(), "네트워크 연결 상태를 확인하세요", Toast.LENGTH_SHORT).show();
             }
 
+        }
+    };
+
+    View.OnClickListener onClickListenerIncPrCount = new View.OnClickListener(){
+        public void onClick(View v) {
+            int count = Integer.valueOf(tvRequestCount.getText().toString());
+            String tvStockStr = tvStock.getText().toString();
+
+            if(tvStockStr.equals("") || tvStockStr.equals("null"))
+                maxProductCount = 1;
+            else
+                maxProductCount = Integer.valueOf(tvStockStr);
+
+            //if(count < MAX_COUNT) {
+            if(count < maxProductCount) {
+                tvRequestCount.setText(Integer.toString(count + 1));
+            }
+        }
+    };
+
+    View.OnClickListener onClickListenerDecPrCount = new View.OnClickListener(){
+        public void onClick(View v) {
+            int count = Integer.valueOf(tvRequestCount.getText().toString());
+            if(count > 1) {
+                tvRequestCount.setText(Integer.toString(count - 1));
+            }
         }
     };
 
@@ -230,15 +271,23 @@ public class TaggingActivity extends Activity {
         //tvColor = (TextView) findViewById(R.id.tvResultColor);
         tvPrice = (TextView) findViewById(R.id.tvResultPrice);
         tvStock = (TextView) findViewById(R.id.tvResultStock);
-        edtRequestCount = (EditText) findViewById(R.id.edtRequestCount);
+        //edtRequestCount = (EditText) findViewById(R.id.edtRequestCount);
+        tvRequestCount = (TextView) findViewById(R.id.tvRequestCount);
         btnPaying = (Button)findViewById(R.id.btnPaying);
         btnCart = (Button)findViewById(R.id.btnCart);
+        btnIncPrCount = (Button) findViewById(R.id.btnIncreaseProductCount);
+        btnDecPrCount = (Button) findViewById(R.id.btnDecreaseProductCount);
 
         btnCart.setOnClickListener(onClickListenerCart); // 장바구니 onClickListener 연결
         btnPaying.setOnClickListener(onClickListenerPaying); // 결제 onClickListener 연결
 
+        btnIncPrCount.setOnClickListener(onClickListenerIncPrCount); // 상품 개수 증가 (플러스 버튼)
+        btnDecPrCount.setOnClickListener(onClickListenerDecPrCount); // 상품 개수 감소 (마이너스 버튼)
+
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
         spinSize.setOnItemSelectedListener(onItemSelectedListenerSize);
+
+        ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
 //        twTotalPriceCalculatorGenerator();
 //        edtRequestCount.addTextChangedListener(twTotalPriceCalculator);
@@ -318,7 +367,28 @@ public class TaggingActivity extends Activity {
                 tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
                 //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
-                execSelectProductInfoThread();
+                threadSelectIsUsed = new ThreadSelectIsUsed();
+
+                threadSelectIsUsed.start();
+                threadSelectIsUsed.join();
+
+                if(boolIsUsed == true) { // used가 1이면
+                    Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+                    tvRequestCount.setText("1");
+                    execSelectProductInfoThread();
+                }
+                else { // used가 0이면
+                    Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+                    execSelectProductInfoThread();
+                    ivSelectedPrImage.setImageResource(android.R.color.transparent);
+                    // 상품 정보 보여준 것 초기화
+                    tvRequestCount.setText("1");
+                    tvBrand.setText("");
+                    tvProductName.setText("");
+                    tvSerial.setText("");
+                }
+
+                //execSelectProductInfoThread();
 
                 return true;
             }
@@ -389,6 +459,7 @@ public class TaggingActivity extends Activity {
                             selectedSize = hashMap.get("size");
                             selectedProductName = hashMap.get("name");
                             selectedBrand = hashMap.get("brand");
+                            selectedProductImage = hashMap.get("image");
                             setTextView(hashMap.get("serial"), tvSerial);
 //                            setTextView(hashMap.get("color"), tvColor);
 //                            setTextView(hashMap.get("size"), tvSize);
@@ -435,7 +506,8 @@ public class TaggingActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                selectedCount = edtRequestCount.getText().toString(); // 장바구니에 넣을 개수
+                //selectedCount = edtRequestCount.getText().toString(); // 장바구니에 넣을 개수
+                selectedCount = tvRequestCount.getText().toString(); // 장바구니에 넣을 개수
 
                 Log.d("cart insert", "userId : " + userId);
                 Log.d("cart insert", "selectedCount : " + selectedCount);
@@ -487,7 +559,8 @@ public class TaggingActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                selectedCount = edtRequestCount.getText().toString(); // 구매할 개수
+                //selectedCount = edtRequestCount.getText().toString(); // 구매할 개수
+                selectedCount = tvRequestCount.getText().toString(); // 구매할 개수
 
                 final HashMap<String, String> result = taggingDao.insertProductPaying(userId,
                         selectedCount, selectedSerial, selectedSize, selectedColor);
@@ -692,6 +765,59 @@ public class TaggingActivity extends Activity {
         }
     }
 
+    class ThreadSelectIsUsed extends Thread {
+        @Override
+        public void run() {
+            try {
+                // Looper.getMainLooper() : main UI 접근하기 위함
+                // main UI 내의 요소를 변경하기 위한 핸들러
+                Handler handler = new Handler(Looper.getMainLooper());
+                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+
+                final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
+
+                //printToastInThread("ThreadSelectIsUsed In");
+
+                if(result != null) {
+                    for (HashMap<String, String> hashMap : result) {
+                        if (hashMap.get("status") == "OK") {
+                            //printToastInThread("ThreadSelectIsUsed Success");
+                            if(hashMap.get("used").equals("1"))
+                                boolIsUsed = true;
+                            else
+                                boolIsUsed = false;
+                        } else {
+                            printToastInThread("ThreadSelectIsUsed Fail");
+                        }
+                    }
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            checkIsUsed = true;
+        }
+    }
+
+    // 이미지 불러와준다
+    class ThreadLoadProductImage extends Thread {
+        @Override
+        public void run() {
+            // Looper.getMainLooper() : main UI 접근하기 위함
+            // main UI 내의 요소를 변경하기 위한 핸들러
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            bitmapSelectedPrImage = commonDao.loadBitmap(selectedProductImage);
+
+            handler.post(new Runnable() {
+                public void run() {
+                    ivSelectedPrImage.setImageBitmap(bitmapSelectedPrImage);
+                }
+            });
+        }
+    }
+
     public void printToastInThread(final String message) {
         Handler mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(new Runnable() {
@@ -715,9 +841,11 @@ public class TaggingActivity extends Activity {
     public void execSelectProductInfoThread() throws InterruptedException {
 
         threadSelectProductInfo = new ThreadSelectProductInfo();
-
         threadSelectProductInfo.start();
         threadSelectProductInfo.join(); // threadSelectProductInfo가 끝날 때까지 기다림
+
+        threadLoadProductImage = new ThreadLoadProductImage(); // 상품 이미지 불러온다
+        threadLoadProductImage.start();
 
         Log.d("cart insert", "threadSelectProductInfo killed");
 

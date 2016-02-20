@@ -2,6 +2,8 @@ package com.hwc.dao.common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -9,30 +11,42 @@ import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public class CommonDao {
 
     private String webServerURL = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com";
     private Activity currentActivity;
+
+    /**********  File Path *************/
+    final String uploadFilePath = "storage/emulated/0/";//경로를 모르겠으면, 갤러리 어플리케이션 가서 메뉴->상세 정보
+    final String uploadFileName = "testimage.jpg"; //전송하고자하는 파일 이름
 
     public String getWebServerURL() {
         return webServerURL;
@@ -179,6 +193,37 @@ public class CommonDao {
         return result;
     }
 
+    public Bitmap loadBitmap( String $imagePath ) {
+        // TODO Auto-generated method stub
+        InputStream inputStream = openHttpConnection( $imagePath ) ;
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream) ;
+        return bitmap;
+    }
+
+    public InputStream openHttpConnection(String $imagePath) {
+        // TODO Auto-generated method stub
+        InputStream stream = null ;
+        try {
+            Log.d("url encode", $imagePath);
+            //Log.d("url encode", URLEncoder.encode($imagePath, "utf-8"));
+            //URL url = new URL(URLEncoder.encode($imagePath, "utf-8"));
+            URL url = new URL($imagePath);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection() ;
+            urlConnection.setRequestMethod( "GET" ) ;
+            urlConnection.connect() ;
+            if( urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+                stream = urlConnection.getInputStream() ;
+            }
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return stream ;
+    }
+
     public boolean isNetworkAvailable() {
         ConnectivityManager connec = (ConnectivityManager) currentActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobileInfo = connec.getNetworkInfo(0);
@@ -192,6 +237,88 @@ public class CommonDao {
         if (wifiInfo != null) bw = wifiInfo.isConnected();
         return (bm || bw || bx);
     }
+
+
+
+    /*
+    public String sendGetRequest(String uri) {
+        try {
+            URL url = new URL(uri);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+            String result;
+
+            StringBuilder sb = new StringBuilder();
+
+            while((result = bufferedReader.readLine())!=null){
+                sb.append(result);
+            }
+
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    */
+
+
+
+    /*
+    public String sendPostRequest(HashMap<String, String> postDataParams) {
+
+        URL url;
+        String response = "";
+        try {
+            url = new URL(webServerURL + "/php/tagging/insertToPaidCart.php");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write(getPostDataString(postDataParams));
+
+            writer.flush();
+            writer.close();
+            os.close();
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                response = br.readLine();
+            } else {
+                response = "Error Registering";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }
+    */
 
 }
 

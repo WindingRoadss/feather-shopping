@@ -140,10 +140,9 @@ public class PaidActivity extends Activity {
 
 
             for (int i = 0; i < paid.length(); i++) {
-                PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i));
+                PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i),  data_price.get(i));
                 adapter.add(u);
             }
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -217,7 +216,7 @@ public class PaidActivity extends Activity {
                                 adapter.txt_yesorno[i].setText("처리 완료");
                                 //PaidListView_custom.data_yestxt.set(i, "처리 완료");
                             }
-                            //Log.d(HWC, "" + adapter.data_yestxt.get(i));
+                           //Log.d(HWC, "" + adapter.data_yestxt.get(i));
                         }
                     }
                 });
