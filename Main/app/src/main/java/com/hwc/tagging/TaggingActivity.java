@@ -32,6 +32,7 @@ import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.dao.tagging.TaggingDao;
 import com.hwc.main.R;
+import com.hwc.shared.LoginSession;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -50,6 +51,11 @@ public class TaggingActivity extends Activity {
     private NFCDao nfcDao;
     private TaggingDao taggingDao;
 
+    // SharedPrefence를 위한 멤버 변수
+    private LoginSession loginSession;
+    private HashMap<String, String> infoList = new HashMap<String, String>();
+    private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
+
     //EditText url;           // url 입력 받는 부분
     //EditText aar;           // AAR 입력 받는 부분
     /* branch test */
@@ -64,7 +70,7 @@ public class TaggingActivity extends Activity {
 
     private Bitmap bitmapSelectedPrImage;
 
-    private String userId = "LDCC1"; // test용
+    private String userId = "default"; // test용
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private TextView tvBrand, tvProductName, tvSerial; //tvSize, tvColor;
@@ -259,6 +265,11 @@ public class TaggingActivity extends Activity {
 
         nfcDao = new NFCDao();
         taggingDao = new TaggingDao(); // DB 접근 객체 생성
+
+        // 로그인 정보 가져오는 부분
+        loginSession = new LoginSession(getApplicationContext());
+        infoListFormPref = loginSession.getPreferencesResultHashMap();
+        userId = infoListFormPref.get("id");
 
         tvTagId = (TextView) findViewById(R.id.tvTagId);
         tvTestResult = (TextView) findViewById(R.id.tvTestResult);
@@ -541,8 +552,6 @@ public class TaggingActivity extends Activity {
                         }
                     });
                 }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
