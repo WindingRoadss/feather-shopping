@@ -42,7 +42,8 @@ public class ListView_custom extends BaseAdapter {
     public TextView txt_color;
     public TextView txt_brand;
     public TextView txt_price;
-    public TextView txt_eachsize[] = new TextView[ca.cart.length()];
+    //public TextView txt_eachsize[] = new TextView[ca.cart.length()];
+    public TextView txt_eachsize[] = new TextView[CartActivity.rowLength];
     public ImageView img_test;
     public CheckBox chk_add;
     public String url_image;
@@ -53,20 +54,23 @@ public class ListView_custom extends BaseAdapter {
     public Button bt_minus;
 
     // +, -
-    public int count[] = new int[ca.cart.length()];
-    public int temp_sum[] = new int[ca.cart.length()];
+    public int count[] = new int[CartActivity.rowLength];
+    public int temp_sum[] = new int[CartActivity.rowLength];
     public static int price_sum = 0;
-    public boolean[] flag = new boolean[ca.cart.length()];
-    public boolean flag2 = false;
+    public boolean[] flag = new boolean[CartActivity.rowLength];
 
-    public static ArrayList<Boolean> data_checked = new ArrayList<>(CartActivity.cart.length());
+    //public static ArrayList<Boolean> data_checked = new ArrayList<>(CartActivity.cart.length());
+    public static ArrayList<Boolean> data_checked = new ArrayList<>(CartActivity.rowLength);
 
 
     public ListView_custom(Context context) {
         super();
         mContext = context;
         mData = new ArrayList<>();
-        for(int i=0;i<CartActivity.cart.length();i++) {
+        /*for(int i=0;i<CartActivity.cart.length();i++) {
+            data_checked.add(i,false);
+        }*/
+        for(int i=0;i<CartActivity.rowLength;i++) {
             data_checked.add(i,false);
         }
     }
@@ -158,13 +162,13 @@ public class ListView_custom extends BaseAdapter {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < ca.cart.length(); i++) {
+            for (int i = 0; i < CartActivity.rowLength; i++) {
                 count[i] = 0;
             }
-            for (int i = 0; i < ca.cart.length(); i++) {
+            for (int i = 0; i < CartActivity.rowLength; i++) {
                 temp_sum[i] = 0;
             }
-            for (int i = 0; i < ca.cart.length(); i++) {
+            for (int i = 0; i < CartActivity.rowLength; i++) {
                 flag[i] = false;
             }
 
@@ -173,7 +177,6 @@ public class ListView_custom extends BaseAdapter {
                 public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
                     if (checked) {
                         flag[position] = true;
-                        flag2 = true;
                         data_checked.set(position, true);
                         Log.d(HWC, "[" + position + "번째 포지션의 체크 누름");
                         count[position]++;
@@ -187,7 +190,6 @@ public class ListView_custom extends BaseAdapter {
                         Log.d(HWC, position + "번째 포지션의 temp_sum : " + temp_sum[position] + "]");
                     } else {
                         flag[position] = false;
-                        flag2 = false;
                         data_checked.set(position, false);
                         Log.d(HWC, "[" + position + "번째 포지션의 체크 해제");
                         count[position] = 0;
@@ -273,7 +275,7 @@ public class ListView_custom extends BaseAdapter {
         if (isChecked) {
             flag = true;
             //Log.d(HWC, "" + ca.data_intprice);
-            for(int i = 0; i <ca.cart.length(); i++) {
+            for(int i = 0; i <ca.rowLength; i++) {
 
                     price_sum += ca.data_intprice.get(i);
                     CartActivity.setTextPrice(price_sum);

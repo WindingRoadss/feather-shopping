@@ -163,10 +163,13 @@ public class CommonDao {
             // if(!numResults.equals("0"))
             if(numResults.equals("0"))
                 return null;
-            else
+             else {
                 result = new HashMap[Integer.valueOf(numResults)];
+            }
             for(int hashIndex = 0; hashIndex < result.length; hashIndex++) {
                 result[hashIndex] = new HashMap<String, String>(); // 객체 생성
+                if(!numResults.equals("0"))
+                    result[0].put("resultNum", numResults);
                 if (o.getString("status").equals("OK")) {
                     result[hashIndex].put("status", "OK");
                     JSONArray ja = o.getJSONArray("results");
