@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hwc.main">
 
-    <!-- NFC와 Webview를 위한 permission 선언-->
+    <!-- NFC와 Webview를 위한 permission 선언 -->
     <uses-permission android:name="android.permission.NFC" />
+
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="true" />
@@ -19,21 +20,23 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Light.NoTitleBar">
-
         <activity android:name="com.hwc.splash.Splash_MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!--<activity android:name="com.hwc.main.MainActivity">
+        <!--
+        <activity android:name="com.hwc.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>-->
+        </activity>
+        -->
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SelectActivity" />
@@ -43,6 +46,9 @@
         <activity android:name="com.hwc.res.custom_res" />
         <activity android:name="com.hwc.tagging.TaggingActivity" />
         <activity android:name="com.hwc.paid.PaidActivity" />
+        <activity android:name="com.hwc.tagging.TaggingSplash" />
+        <activity android:name=".VisSelActivity" />
+        <activity android:name="com.hwc.nfc.NFCSplash"></activity>
     </application>
-</manifest>
 
+</manifest>

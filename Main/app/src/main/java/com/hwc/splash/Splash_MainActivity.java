@@ -26,7 +26,7 @@ public class Splash_MainActivity extends Activity {
                 startActivity(intent);
                 finish();
             }
-        }, 3500);
+        }, 3150);
     }
 
     @Override
@@ -37,5 +37,4 @@ public class Splash_MainActivity extends Activity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
 }

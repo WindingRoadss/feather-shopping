@@ -14,9 +14,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hwc.dao.paid.PaidDao;
 import com.hwc.main.R;
+import com.hwc.main.SelectActivity;
 import com.hwc.shared.LoginSession;
 
 import org.apache.http.client.ClientProtocolException;
@@ -34,6 +36,7 @@ import java.util.HashMap;
 
 public class PaidActivity extends Activity {
     public PaidListView_custom adapter;
+    public SelectActivity sa = new SelectActivity();
     public String myJSON;
 
     public static final String HWC = "HWC";
@@ -66,7 +69,6 @@ public class PaidActivity extends Activity {
     public static TextView txt_intprice;
     private PaidDao PaidDao;
     public boolean ifViewed;
-
     // SharedPrefence를 위한 멤버 변수
     private String userId = "default";
     private LoginSession loginSession;
@@ -103,7 +105,7 @@ public class PaidActivity extends Activity {
         }
 
         showList(hashMapResult);
-
+        sa.progDialog.dismiss();
 
         bt_bring.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,19 +173,25 @@ public class PaidActivity extends Activity {
 
         //*JSON 언어*//*
         //for (int i = 0; i < cart.length(); i++) {
-        for (int i = 0; i < rowLength; i++) {
-            //JSONObject c = paid.getJSONObject(i);
-            data_name.add(hashMapResult[i].get(TAG_NAME));
-            data_size.add(hashMapResult[i].get(TAG_SIZE));
-            data_color.add(hashMapResult[i].get(TAG_COLOR));
-            data_brand.add(hashMapResult[i].get(TAG_BRAND));
-            data_image.add(hashMapResult[i].get(TAG_IMAGE));
-            data_price.add(hashMapResult[i].get(TAG_PRICE));
-            data_snum.add(hashMapResult[i].get(TAG_SNUM));
-            data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
+        try {
+            for (int i = 0; i < rowLength; i++) {
+                //JSONObject c = paid.getJSONObject(i);
+                data_name.add(hashMapResult[i].get(TAG_NAME));
+                data_size.add(hashMapResult[i].get(TAG_SIZE));
+                data_color.add(hashMapResult[i].get(TAG_COLOR));
+                data_brand.add(hashMapResult[i].get(TAG_BRAND));
+                data_image.add(hashMapResult[i].get(TAG_IMAGE));
+                data_price.add(hashMapResult[i].get(TAG_PRICE));
+                data_snum.add(hashMapResult[i].get(TAG_SNUM));
+                data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
 
-            Log.d("showList i", Integer.toString(i));
-            Log.d("showList", hashMapResult[i].get(TAG_PRICE));
+                Log.d("showList i", Integer.toString(i));
+                Log.d("showList", hashMapResult[i].get(TAG_PRICE));
+            }
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(getApplicationContext(), "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
         Log.d(HWC, "data_price의 값 : " + data_price);
 

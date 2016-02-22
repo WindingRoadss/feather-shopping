@@ -4,30 +4,22 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Charsets;
-import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.dao.tagging.TaggingDao;
@@ -37,10 +29,8 @@ import com.hwc.shared.LoginSession;
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class TaggingActivity extends Activity {
 
@@ -378,21 +368,21 @@ public class TaggingActivity extends Activity {
                 tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
                 //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
-                threadSelectIsUsed = new ThreadSelectIsUsed();
+                    threadSelectIsUsed = new ThreadSelectIsUsed();
 
-                threadSelectIsUsed.start();
-                threadSelectIsUsed.join();
+                    threadSelectIsUsed.start();
+                    threadSelectIsUsed.join();
 
-                if(boolIsUsed == true) { // used가 1이면
-                    Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
-                    tvRequestCount.setText("1");
-                    execSelectProductInfoThread();
-                }
-                else { // used가 0이면
-                    Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
-                    execSelectProductInfoThread();
-                    ivSelectedPrImage.setImageResource(android.R.color.transparent);
-                    // 상품 정보 보여준 것 초기화
+                    if(boolIsUsed == true) { // used가 1이면
+                        Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+                        tvRequestCount.setText("1");
+                        execSelectProductInfoThread();
+                    }
+                    else { // used가 0이면
+                        Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+                        execSelectProductInfoThread();
+                        ivSelectedPrImage.setImageResource(android.R.color.transparent);
+                        // 상품 정보 보여준 것 초기화
                     tvRequestCount.setText("1");
                     tvBrand.setText("");
                     tvProductName.setText("");

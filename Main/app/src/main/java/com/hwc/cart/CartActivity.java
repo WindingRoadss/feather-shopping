@@ -2,7 +2,6 @@ package com.hwc.cart;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,17 +19,14 @@ import android.widget.Toast;
 
 import com.hwc.dao.cart.CartDao;
 import com.hwc.main.R;
+import com.hwc.main.SelectActivity;
 import com.hwc.paid.PaidActivity;
 import com.hwc.shared.LoginSession;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,6 +38,7 @@ import java.util.HashMap;
 
 public class CartActivity extends Activity {
     public ListView_custom adapter;
+    public SelectActivity sa = new SelectActivity();
     public String myJSON;
 
     public static final String HWC = "HWC";
@@ -61,7 +58,6 @@ public class CartActivity extends Activity {
     public ArrayList<String> data_price = new ArrayList<>();
     public ArrayList<String> data_snum = new ArrayList<>();
 
-
     public static ArrayList<Integer> data_intprice = new ArrayList<>();
 
     private CartDao CartDao;
@@ -70,7 +66,7 @@ public class CartActivity extends Activity {
     public static int rowLength = 0;
 
     public ListView list;
-    public ProgressDialog progDialog;
+
 
     public Button btnSend;
     public Button bt_request;
@@ -95,10 +91,6 @@ public class CartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
-        progDialog = new ProgressDialog(this);
-        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progDialog.setMessage("로딩중입니다......");
-        progDialog.show();
 
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -120,11 +112,13 @@ public class CartActivity extends Activity {
         try {
             threadSelectProductInfo.start();
             threadSelectProductInfo.join();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         showList(hashMapResult);
+        sa.progDialog.dismiss();
 
         bt_request = (Button) findViewById(R.id.bt_request);
         bt_request.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +150,6 @@ public class CartActivity extends Activity {
         adapter = new ListView_custom(getApplicationContext());
         list = (ListView) findViewById(R.id.listView);
         list.setAdapter(adapter);
-
         try {
             //*JSON 언어*//*
             //for (int i = 0; i < cart.length(); i++) {
@@ -169,17 +162,17 @@ public class CartActivity extends Activity {
                 data_image.add(hashMapResult[i].get(TAG_IMAGE));
                 data_price.add(hashMapResult[i].get(TAG_PRICE));
                 data_snum.add(hashMapResult[i].get(TAG_SNUM));
-
-                //Log.d("showList i", Integer.toString(i));
-                //Log.d("showList", hashMapResult[i].get(TAG_PRICE));
-
-
                 data_intprice.add(Integer.parseInt(data_price.get(i)));
-                //price_sum += data_intprice.get(i);
             }
+            //Log.d("showList i", Integer.toString(i));
+            //Log.d("showList", hashMapResult[i].get(TAG_PRICE));
+
+
+            //price_sum += data_intprice.get(i);
         } catch (Exception e) {
-            Toast.makeText(CartActivity.this, "등록된 상품이 없습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
+
         //Log.d(HWC, "data_price의 값 : " + data_price);
 
         //Log.d(HWC, "snum의 값 : " + data_snum);
@@ -191,11 +184,9 @@ public class CartActivity extends Activity {
                     data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i));
             adapter.add(u);
         }
-
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
     }
+
+
 
 
    /* public void showList() {
@@ -305,6 +296,8 @@ public class CartActivity extends Activity {
             protected void onPostExecute(String result) {
                 Intent intent = new Intent(CartActivity.this, PaidActivity.class);
                 startActivity(intent);
+                adapter.price_sum = 0;
+                finish();
             }
         }
         TheadTest theadTest = new TheadTest();
@@ -370,7 +363,6 @@ public class CartActivity extends Activity {
         @Override
         public void run() {
             try {
-
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
@@ -397,6 +389,5 @@ public class CartActivity extends Activity {
             }
         }
     }
-
 }
 
