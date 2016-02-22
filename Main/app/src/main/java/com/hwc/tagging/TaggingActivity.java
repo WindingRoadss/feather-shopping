@@ -32,18 +32,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TaggingActivity extends Activity {
+    public class TaggingActivity extends Activity {
 
-    private NfcAdapter nfcAdapter;
-    private PendingIntent pendingIntent;
+        private NfcAdapter nfcAdapter;
+        private PendingIntent pendingIntent;
 
-    private CommonDao commonDao;
-    private NFCDao nfcDao;
-    private TaggingDao taggingDao;
+        private CommonDao commonDao;
+        private NFCDao nfcDao;
+        private TaggingDao taggingDao;
 
-    // SharedPrefence를 위한 멤버 변수
-    private LoginSession loginSession;
-    private HashMap<String, String> infoList = new HashMap<String, String>();
+        // SharedPrefence를 위한 멤버 변수
+        private LoginSession loginSession;
+        private HashMap<String, String> infoList = new HashMap<String, String>();
     private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
 
     //EditText url;           // url 입력 받는 부분
