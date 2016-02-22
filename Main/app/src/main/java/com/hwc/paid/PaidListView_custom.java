@@ -38,19 +38,19 @@ public class PaidListView_custom extends BaseAdapter {
 
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<PaidListView_getset> mData;
-    public Bitmap btp_test = null;
+    public Bitmap btp_test;
     public boolean flag = false;
     public int get_position;
 
 
-    public static ArrayList<Boolean> data_checked = new ArrayList<>(PaidActivity.paid.length());
+    public static ArrayList<Boolean> data_checked = new ArrayList<>(PaidActivity.rowLength);
 
 
     public PaidListView_custom(Context context) {
         super();
         mContext = context;
         mData = new ArrayList<>();
-        for (int i = 0; i < PaidActivity.paid.length(); i++) {
+        for (int i = 0; i < PaidActivity.rowLength; i++) {
             data_checked.add(i, false);
         }
     }
@@ -103,7 +103,7 @@ public class PaidListView_custom extends BaseAdapter {
         final ImageView img_test = (ImageView) convertView.findViewById(R.id.img_test);
         final CheckBox chk_cfrm = (CheckBox) convertView.findViewById(R.id.chk_cfrm);
         final TextView txt_brdel = (TextView) convertView.findViewById(R.id.txt_brdel);
-        final imageThread it = new imageThread();
+
         //convertView = new NumberView( getContext(), getItem( position));
 
 
@@ -123,7 +123,7 @@ public class PaidListView_custom extends BaseAdapter {
             txt_price.setText(lv_gst.getPrice());
             txt_brdel.setText(lv_gst.getBrdel());
 
-
+            imageThread it = new imageThread();
             it.start();
             try {
                 //  메인 스레드는 작업 스레드가 이미지 작업을 가져올 때까지
@@ -136,7 +136,6 @@ public class PaidListView_custom extends BaseAdapter {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
 
             chk_cfrm.setChecked(((ListView) parent).isItemChecked(position));
             chk_cfrm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -160,6 +159,7 @@ public class PaidListView_custom extends BaseAdapter {
     public void add(PaidListView_getset user) {
         mData.add(user);
     }
+
 
     class imageThread extends Thread {
         @Override

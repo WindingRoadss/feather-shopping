@@ -50,4 +50,5 @@ public class ListView_getset {
     public String getSnum() {
         return snum;
     }
+
 }

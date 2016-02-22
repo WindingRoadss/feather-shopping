@@ -12,15 +12,16 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="450dp">
+        android:layout_height="434dp">
 
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="450dp"
+            android:layout_height="434dp"
             android:id="@+id/listView"
             android:layout_alignParentLeft="true"
+
             android:layout_alignParentTop="true"
-     />
+            />
 
 
     </LinearLayout>
@@ -37,20 +38,18 @@
             android:layout_height="wrap_content"
             android:text="수령"
             android:id="@+id/bt_bring"
-            android:layout_alignParentTop="false"
+            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentStart="true" />
 
         <Button
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="배송"
             android:id="@+id/bt_delivery"
-            android:layout_alignParentTop="false"
+            android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -6,13 +6,13 @@
     android:padding="5dp">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingRight="10dp"
+        android:id="@+id/linearLayout2">
 
 
         <TextView
@@ -68,10 +68,10 @@
             android:layout_height="wrap_content" />
 
         <CheckBox
-            android:id="@+id/chk_cfrm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="선택" />
+            android:text="선택"
+            android:id="@+id/chk_cfrm" />
 
         <TextView
             android:id="@+id/txt_brdel"
@@ -83,4 +83,6 @@
             android:typeface="sans" />
 
     </LinearLayout>
+
+
 </RelativeLayout>

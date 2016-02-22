@@ -2,11 +2,13 @@ package com.hwc.paid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -15,16 +17,12 @@ import android.widget.TextView;
 
 import com.hwc.dao.paid.PaidDao;
 import com.hwc.main.R;
+import com.hwc.shared.LoginSession;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -61,20 +59,33 @@ public class PaidActivity extends Activity {
     public Button bt_bring;
     public Button bt_delivery;
     public static JSONArray paid = null;
+    public static int rowLength = 0;
+
     public ListView list;
-    public ProgressDialog progDialog;
+
     public static TextView txt_intprice;
     private PaidDao PaidDao;
     public boolean ifViewed;
 
+    // SharedPrefence를 위한 멤버 변수
+    private String userId = "default";
+    private LoginSession loginSession;
+    private HashMap<String, String> infoList = new HashMap<String, String>();
+    private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
+
+    private HashMap<String, String>[] hashMapResult = null;
+
+    private ThreadSelectProductInfo threadSelectProductInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paid);
-        progDialog = new ProgressDialog(this);
-        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progDialog.setMessage("로딩중입니다......");
-        progDialog.show();
+
+        loginSession = new LoginSession(getApplicationContext());
+        infoListFormPref = loginSession.getPreferencesResultHashMap();
+        userId = infoListFormPref.get("id");
 
         txt_intprice = (TextView) findViewById(R.id.txt_intprice);
         bt_bring = (Button) findViewById(R.id.bt_bring);
@@ -82,7 +93,18 @@ public class PaidActivity extends Activity {
         //txt_intprice.setText("가격 : 테스트중");
         PaidDao = new PaidDao();
         //cartList = new ArrayList<>();
-        getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/paid/paid.php");
+        //getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/paid/paid.php");
+        threadSelectProductInfo = new ThreadSelectProductInfo();
+        try {
+            threadSelectProductInfo.start();
+            threadSelectProductInfo.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        showList(hashMapResult);
+
+
         bt_bring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,37 +156,83 @@ public class PaidActivity extends Activity {
         });
     }
 
-    public void showList() {
+    public void showList(HashMap<String, String>[] hashMapResult) {
+        if(hashMapResult != null)
+            rowLength = Integer.valueOf(hashMapResult[0].get("resultNum"));
 
-        try {
-            JSONObject jsonObj = new JSONObject(myJSON);
-            paid = jsonObj.getJSONArray(TAG_RESULTS);
-            adapter = new PaidListView_custom(getApplicationContext());
-            list = (ListView) findViewById(R.id.listView);
-            list.setAdapter(adapter);
+//        try {
+//            JSONObject jsonObj = new JSONObject(myJSON);
+//            cart = jsonObj.getJSONArray(TAG_RESULTS);
 
-            //*JSON 언어*//*
-            for (int i = 0; i < paid.length(); i++) {
-                JSONObject c = paid.getJSONObject(i);
-                data_name.add(c.getString(TAG_NAME));
-                data_size.add(c.getString(TAG_SIZE));
-                data_color.add(c.getString(TAG_COLOR));
-                data_brand.add(c.getString(TAG_BRAND));
-                data_image.add(c.getString(TAG_IMAGE));
-                data_price.add(c.getString(TAG_PRICE));
-                data_snum.add(c.getString(TAG_SNUM));
-                data_brdel.add(c.getString(TAG_BRDEL));
-            }
+        adapter = new PaidListView_custom(getApplicationContext());
+        list = (ListView) findViewById(R.id.listView);
+        list.setAdapter(adapter);
 
-            for (int i = 0; i < paid.length(); i++) {
-                PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_brdel.get(i));
-                adapter.add(u);
-            }
-            ifViewed = true;
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        //*JSON 언어*//*
+        //for (int i = 0; i < cart.length(); i++) {
+        for (int i = 0; i < rowLength; i++) {
+            //JSONObject c = paid.getJSONObject(i);
+            data_name.add(hashMapResult[i].get(TAG_NAME));
+            data_size.add(hashMapResult[i].get(TAG_SIZE));
+            data_color.add(hashMapResult[i].get(TAG_COLOR));
+            data_brand.add(hashMapResult[i].get(TAG_BRAND));
+            data_image.add(hashMapResult[i].get(TAG_IMAGE));
+            data_price.add(hashMapResult[i].get(TAG_PRICE));
+            data_snum.add(hashMapResult[i].get(TAG_SNUM));
+            data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
+
+            Log.d("showList i", Integer.toString(i));
+            Log.d("showList", hashMapResult[i].get(TAG_PRICE));
         }
+        Log.d(HWC, "data_price의 값 : " + data_price);
+
+        Log.d(HWC, "snum의 값 : " + data_snum);
+
+        for (int i = 0; i < rowLength; i++) {
+            PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i),
+                    data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_brdel.get(i));
+            adapter.add(u);
+        }
+        ifViewed = true;
+
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+/*    public void showList() {
+
+            try {
+                JSONObject jsonObj = new JSONObject(myJSON);
+                paid = jsonObj.getJSONArray(TAG_RESULTS);
+                adapter = new PaidListView_custom(getApplicationContext());
+                list = (ListView) findViewById(R.id.listView);
+                list.setAdapter(adapter);
+
+                /*//*JSON 언어*//**//*
+                for (int i = 0; i < paid.length(); i++) {
+                    JSONObject c = paid.getJSONObject(i);
+                    data_name.add(c.getString(TAG_NAME));
+                    data_size.add(c.getString(TAG_SIZE));
+                    data_color.add(c.getString(TAG_COLOR));
+                    data_brand.add(c.getString(TAG_BRAND));
+                    data_image.add(c.getString(TAG_IMAGE));
+                    data_price.add(c.getString(TAG_PRICE));
+                    data_snum.add(c.getString(TAG_SNUM));
+                    data_brdel.add(c.getString(TAG_BRDEL));
+                }
+
+                for (int i = 0; i < paid.length(); i++) {
+                    PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i),
+                            data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_brdel.get(i));
+                    adapter.add(u);
+                }
+                ifViewed = true;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
     }
 
     public void getData(String url) {
@@ -196,12 +264,11 @@ public class PaidActivity extends Activity {
             protected void onPostExecute(String result) {
                 myJSON = result;
                 showList();
-                progDialog.dismiss();
             }
         }
         GetDataJSON g = new GetDataJSON();
         g.execute(url);
-    }
+    }*/
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -231,6 +298,10 @@ public class PaidActivity extends Activity {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
                         // 이벤트 실행
+                        executeBringThead();
+                        Intent intent = new Intent(getBaseContext(), PaidActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 });
         AlertDialog alert = alertDlg.create();
@@ -256,7 +327,7 @@ public class PaidActivity extends Activity {
                     public void onClick(DialogInterface dialog,
                                         int whichButton) {
                         // 이벤트 실행
-                        executeTheadTest();
+                        executeDeliveryThead();
                         Intent intent = new Intent(getBaseContext(), PaidActivity.class);
                         startActivity(intent);
                         finish();
@@ -267,7 +338,7 @@ public class PaidActivity extends Activity {
         alert.show();
     }
 
-    public void executeTheadTest() {
+    public void executeDeliveryThead() {
         class TheadTest extends AsyncTask<String, Void, String> {
             @Override
             protected String doInBackground(String... params) {
@@ -289,14 +360,79 @@ public class PaidActivity extends Activity {
         theadTest.execute();
     }
 
+    public void executeBringThead() {
+        class TheadTest extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    insertBring();
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+
+            }
+        }
+        TheadTest theadTest = new TheadTest();
+        theadTest.execute();
+    }
+
     public void insertDelivery() throws IOException {
-        HashMap<String, String>[] result = new HashMap[paid.length()];
+        HashMap<String, String>[] result = new HashMap[rowLength];
         //boolean queryResult = false;
-        for (int i = 0; i < paid.length(); i++) {
+        for (int i = 0; i< rowLength; i++){
             result[i] = new HashMap<String, String>();
             //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if (PaidListView_custom.data_checked.get(i) == true)
-                result[i] = PaidDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
+            if(PaidListView_custom.data_checked.get(i) == true)
+                result[i] = PaidDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
+        }
+    }
+
+    public void insertBring() throws IOException {
+        HashMap<String, String>[] result = new HashMap[rowLength];
+        //boolean queryResult = false;
+        for (int i = 0; i< rowLength; i++){
+            result[i] = new HashMap<String, String>();
+            //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
+            if(PaidListView_custom.data_checked.get(i) == true)
+                result[i] = PaidDao.Bring(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
+        }
+    }
+
+    class ThreadSelectProductInfo extends Thread {
+        @Override
+        public void run() {
+            try {
+
+                // Looper.getMainLooper() : main UI 접근하기 위함
+                // main UI 내의 요소를 변경하기 위한 핸들러
+                Handler handler = new Handler(Looper.getMainLooper());
+
+                // test : GAP
+                //HashMap<String, String>[] result = nfcDao.selectProductName(selectedBrand);
+                hashMapResult = PaidDao.selectProductsInCart(userId);
+
+                if(hashMapResult != null) {
+
+                    for (HashMap<String, String> hashMap : hashMapResult) {
+                        if (hashMap.get("status") == "OK") {
+                            //itemList.add(hashMap.get("name")); // 브랜드 리스트
+                        } else {
+                            //printToastInThread("selectProductName Fail");
+                        }
+                    }
+                }
+
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
