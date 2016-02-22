@@ -1,55 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="16dp"
+    android:layout_height="match_parent"
+    android:background="@drawable/paidimage"
     android:orientation="vertical"
-    android:paddingBottom="16dp" tools:context=".MainActivity">
+    android:scaleType="fitXY"
+    tools:context=".MainActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="434dp">
+        android:layout_height="373dp"
+        android:orientation="vertical"
+        android:layout_marginTop="99dp">
 
         <ListView
-            android:layout_width="match_parent"
-            android:layout_height="434dp"
             android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
 
-            android:layout_alignParentTop="true"
-            />
+            android:layout_alignParentTop="true" />
 
 
     </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false">
+        android:layout_alignParentStart="false"
+        android:layout_marginBottom="18dp">
 
         <Button
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="수령"
             android:id="@+id/bt_bring"
-            android:layout_alignParentTop="true"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="수령"
+            android:background="@drawable/button_selector3"
+            android:layout_marginLeft="20dp"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:typeface="sans"/>
 
         <Button
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="배송"
             android:id="@+id/bt_delivery"
-            android:layout_alignParentTop="true"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentTop="true"
+            android:text="배송"
+            android:background="@drawable/button_selector"
+            android:layout_marginRight="20dp"
+            android:textColor="#ffffff"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:typeface="sans"/>
     </RelativeLayout>
 
 </RelativeLayout>

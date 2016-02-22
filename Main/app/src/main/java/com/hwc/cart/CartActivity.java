@@ -177,7 +177,7 @@ public class CartActivity extends Activity {
 
         //Log.d(HWC, "snum의 값 : " + data_snum);
 
-        txt_intprice.setText("가격 : " + Integer.toString(adapter.price_sum));
+        txt_intprice.setText("총 액 : " + Integer.toString(adapter.price_sum) + "원");
 
         for (int i = 0; i < rowLength; i++) {
             ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i),
@@ -230,7 +230,7 @@ public class CartActivity extends Activity {
     }*/
 
     static public void setTextPrice(final int input) {
-        txt_intprice.setText("가격 : " + Integer.toString(input));
+        txt_intprice.setText("총 액 : " + Integer.toString(input) + "원");
     }
 
 /*    public void getData(String url) {

@@ -37,21 +37,11 @@ public class ListView_custom extends BaseAdapter {
 
 
     // ListView 내부 View들을 가르킬 변수들
-    public TextView txt_name;
-    public TextView txt_size;
-    public TextView txt_color;
-    public TextView txt_brand;
-    public TextView txt_price;
-    //public TextView txt_eachsize[] = new TextView[ca.cart.length()];
-    public TextView txt_eachsize[] = new TextView[CartActivity.rowLength];
-    public ImageView img_test;
-    public CheckBox chk_add;
-    public String url_image;
+
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<ListView_getset> mData;
     public Bitmap btp_test;
-    public Button bt_add;
-    public Button bt_minus;
+
 
     // +, -
     public int count[] = new int[CartActivity.rowLength];
@@ -114,22 +104,22 @@ public class ListView_custom extends BaseAdapter {
             v = ((LayoutInflater) mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                     .inflate(R.layout.custom_list, null);
-
-            // 레이아웃이 메모리에 올라왔기 때문에 이를 이용하여 포함된 뷰들을 참조할 수 있습니다.
-            txt_name = (TextView) v.findViewById(R.id.txt_name);
-            txt_size = (TextView) v.findViewById(R.id.txt_size);
-            txt_color = (TextView) v.findViewById(R.id.txt_color);
-            txt_brand = (TextView) v.findViewById(R.id.txt_brand);
-            txt_price = (TextView) v.findViewById(R.id.txt_price);
-            txt_eachsize[position] = (TextView) v.findViewById(R.id.txt_eachsize);
-            //url_image = (TextView) v.findViewById(R.id.url_image);
-            //btnSend = (Button) v.findViewById(R.id.bt_detail);
-            bt_add = (Button) v.findViewById(R.id.bt_add);
-            bt_minus = (Button) v.findViewById(R.id.bt_minus);
-            img_test = (ImageView) v.findViewById(R.id.img_test);
-            chk_add = (CheckBox) v.findViewById(R.id.chk_add);
-
         }
+
+        final TextView txt_name = (TextView) v.findViewById(R.id.txt_name);
+        final TextView txt_size = (TextView) v.findViewById(R.id.txt_size);
+        final TextView txt_color = (TextView) v.findViewById(R.id.txt_color);
+        final TextView txt_brand = (TextView) v.findViewById(R.id.txt_brand);
+        final TextView txt_price = (TextView) v.findViewById(R.id.txt_price);
+        final TextView  txt_eachsize = (TextView) v.findViewById(R.id.txt_eachsize);
+        final TextView txt_eacharr[] = new TextView[CartActivity.rowLength];
+        //url_image = (TextView) v.findViewById(R.id.url_image);
+        //btnSend = (Button) v.findViewById(R.id.bt_detail);
+        final Button bt_add = (Button) v.findViewById(R.id.bt_add);
+        final Button bt_minus = (Button) v.findViewById(R.id.bt_minus);
+        final ImageView img_test = (ImageView) v.findViewById(R.id.img_test);
+        final CheckBox chk_add = (CheckBox) v.findViewById(R.id.chk_add);
+        txt_eacharr[position] = (TextView) v.findViewById(R.id.txt_eachsize);
 
         // 받아온 position 값을 이용하여 배열에서 아이템을 가져온다.
         lv_gst = getItem(position);
@@ -137,7 +127,7 @@ public class ListView_custom extends BaseAdapter {
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
         chk_add.setTag(lv_gst);
         bt_add.setTag(lv_gst);
-        txt_eachsize[position].setTag(lv_gst);
+        txt_eacharr[position].setTag(lv_gst);
         bt_minus.setTag(lv_gst);
 
         // 데이터의 실존 여부를 판별합니다.
@@ -183,7 +173,7 @@ public class ListView_custom extends BaseAdapter {
                         temp_sum[position] +=  ca.data_intprice.get(position);
                         price_sum +=  ca.data_intprice.get(position);
                         CartActivity.setTextPrice(price_sum);
-                        txt_eachsize[position].setText(Integer.toString(count[position]));
+                        txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
                         Log.d(HWC, position + "번째 포지션의 count : " + count[position]);
                         Log.d(HWC, position + "번째 포지션의 data_intprice : " + ca.data_intprice.get(position));
@@ -196,7 +186,7 @@ public class ListView_custom extends BaseAdapter {
                         price_sum -= temp_sum[position];
                         temp_sum[position] = 0;
                         CartActivity.setTextPrice(price_sum);
-                        txt_eachsize[position].setText(Integer.toString(count[position]));
+                        txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
                         Log.d(HWC, position + "번째 포지션의 count : " + count[position]);
                         Log.d(HWC, position + "번째 포지션의 data_intprice : " + ca.data_intprice.get(position));
@@ -215,7 +205,7 @@ public class ListView_custom extends BaseAdapter {
                         temp_sum[position] += ca.data_intprice.get(position);
                         price_sum +=  ca.data_intprice.get(position);
                         CartActivity.setTextPrice(price_sum);
-                        txt_eachsize[position].setText(Integer.toString(count[position]));
+                        txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
                         Log.d(HWC, position + "번째 포지션의 count : " + count[position]);
                         Log.d(HWC, position + "번째 포지션의 data_intprice : " + ca.data_intprice.get(position));
@@ -234,7 +224,7 @@ public class ListView_custom extends BaseAdapter {
                             temp_sum[position] -= ca.data_intprice.get(position);
                             price_sum -= ca.data_intprice.get(position);
                             CartActivity.setTextPrice(price_sum);
-                            txt_eachsize[position].setText(Integer.toString(count[position]));
+                            txt_eacharr[position].setText(Integer.toString(count[position]));
                             Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
                             Log.d(HWC, position + "번째 포지션의 count : " + count[position]);
                             Log.d(HWC, position + "번째 포지션의 data_intprice : " + ca.data_intprice.get(position));
