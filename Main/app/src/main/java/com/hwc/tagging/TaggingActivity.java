@@ -32,18 +32,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-    public class TaggingActivity extends Activity {
+public class TaggingActivity extends Activity {
 
-        private NfcAdapter nfcAdapter;
-        private PendingIntent pendingIntent;
+    private CommonDao commonDao;
+    private NFCDao nfcDao;
+    private TaggingDao taggingDao;
 
-        private CommonDao commonDao;
-        private NFCDao nfcDao;
-        private TaggingDao taggingDao;
-
-        // SharedPrefence를 위한 멤버 변수
-        private LoginSession loginSession;
-        private HashMap<String, String> infoList = new HashMap<String, String>();
+    // SharedPrefence를 위한 멤버 변수
+    private LoginSession loginSession;
+    private HashMap<String, String> infoList = new HashMap<String, String>();
     private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
 
     //EditText url;           // url 입력 받는 부분
@@ -61,6 +58,7 @@ import java.util.HashMap;
     private Bitmap bitmapSelectedPrImage;
 
     private String userId = "default"; // test용
+
 
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private TextView tvBrand, tvProductName, tvSerial; //tvSize, tvColor;
@@ -93,6 +91,12 @@ import java.util.HashMap;
     private ThreadInsertProductPaying threadInsertProductPaying;
     private ThreadSelectIsUsed threadSelectIsUsed;
     private ThreadLoadProductImage threadLoadProductImage;
+
+    // bundle 용
+    private String strTagIdFromBundle;
+    private boolean boolIsUsedFromBundle;
+    private boolean boolIsEmptyFromBundle;
+    private Bundle bundle;
 
 //    private TextWatcher twTotalPriceCalculator;
 //
@@ -250,6 +254,11 @@ import java.util.HashMap;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tagging);
 
+        bundle = getIntent().getExtras();
+        strTagIdFromBundle = bundle.getString("tagId");
+        boolIsUsedFromBundle = bundle.getBoolean("boolIsUsed");
+        boolIsEmptyFromBundle = bundle.getBoolean("boolIsEmptyChip");
+
         commonDao = new CommonDao();
         commonDao.setCurrentActivity(this);
 
@@ -288,118 +297,38 @@ import java.util.HashMap;
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
         spinSize.setOnItemSelectedListener(onItemSelectedListenerSize);
 
-        ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
+        ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage);
+
+        tvTagId.setText(strTagIdFromBundle);
+        boolIsUsed = boolIsUsedFromBundle;
 
 //        twTotalPriceCalculatorGenerator();
 //        edtRequestCount.addTextChangedListener(twTotalPriceCalculator);
 
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
-        Intent intent = new Intent(this, getClass())
-                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-    }
-
-
-    @Override
-    protected void onPause() {
-        if (nfcAdapter != null) {
-            nfcAdapter.disableForegroundDispatch(this);
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        if (nfcAdapter != null) {
-            nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
-        }
-        super.onResume();
-    }
-
-    // NFC 태그 스캔시 호출되는 메소드
-    @Override
-    protected void onNewIntent(Intent intent) {
-
-        if (intent != null) {
-            processTag(intent); // processTag 메소드 호출
-        }
-        super.onNewIntent(intent);
-    }
-
-    // onNewIntent 메소드 수행 후 호출되는 메소드
-    private void processTag(Intent intent) {
-
-        // 감지된 태그를 가리키는 객체
-        Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        // 감지된 태그 Read
-        readTag(detectedTag);
-    }
-
-    // 감지된 태그에 NdefMessage를 쓰는 메소드
-    public boolean readTag(Tag tag) {
-
-        try {
-
-            Ndef ndef = Ndef.get(tag);
-
-            if (ndef == null) { // 새로운 NFC chip일 때
-
-                byte[] tagId = tag.getId();
-
-                tvTagId.setText("포맷이 필요합니다" + byteArrayToHex(tagId)); // tvTagId 세팅
-                //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
-
-                return true;
-
+        if(boolIsUsed == true) { // used가 1이면
+            Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+            tvRequestCount.setText("1");
+            try {
+                execSelectProductInfoThread();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-
-            // 어떤 data가 들어있으면
-            else { // ndef != null
-
-                ndef.connect();
-
-                byte[] tagId = tag.getId();
-
-                //Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
-
-                tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-                //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
-
-                    threadSelectIsUsed = new ThreadSelectIsUsed();
-
-                    threadSelectIsUsed.start();
-                    threadSelectIsUsed.join();
-
-                    if(boolIsUsed == true) { // used가 1이면
-                        Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
-                        tvRequestCount.setText("1");
-                        execSelectProductInfoThread();
-                    }
-                    else { // used가 0이면
-                        Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
-                        execSelectProductInfoThread();
-                        ivSelectedPrImage.setImageResource(android.R.color.transparent);
-                        // 상품 정보 보여준 것 초기화
-                    tvRequestCount.setText("1");
-                    tvBrand.setText("");
-                    tvProductName.setText("");
-                    tvSerial.setText("");
-                }
-
-                //execSelectProductInfoThread();
-
-                return true;
+        }
+        else { // used가 0이면
+            Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+            try {
+                execSelectProductInfoThread();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-
+            ivSelectedPrImage.setImageResource(android.R.color.transparent);
+            // 상품 정보 보여준 것 초기화
+            tvRequestCount.setText("1");
+            tvBrand.setText("");
+            tvProductName.setText("");
+            tvSerial.setText("");
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
 
-            return false;
-        }
     }
 
     // 포맷하는 메서드
@@ -423,21 +352,6 @@ import java.util.HashMap;
 //            }
 //        }
 //    }
-
-    private String byteArrayToHex(byte[] ba) {
-        if (ba == null || ba.length == 0) {
-            return null;
-        }
-
-        StringBuffer sb = new StringBuffer(ba.length * 2);
-        String hexNumber;
-        for (int x = 0; x < ba.length; x++) {
-            hexNumber = "0" + Integer.toHexString(0xff & ba[x]);
-
-            sb.append(hexNumber.substring(hexNumber.length() - 2));
-        }
-        return sb.toString();
-    }
 
     class ThreadSelectProductInfo extends Thread {
         @Override
@@ -807,7 +721,8 @@ import java.util.HashMap;
             // main UI 내의 요소를 변경하기 위한 핸들러
             Handler handler = new Handler(Looper.getMainLooper());
 
-            bitmapSelectedPrImage = commonDao.loadBitmap(selectedProductImage);
+            if(selectedProductImage != null || selectedProductImage != "")
+                bitmapSelectedPrImage = commonDao.loadBitmap(selectedProductImage);
 
             handler.post(new Runnable() {
                 public void run() {

@@ -198,9 +198,13 @@ public class CommonDao {
 
     public Bitmap loadBitmap( String $imagePath ) {
         // TODO Auto-generated method stub
-        InputStream inputStream = openHttpConnection( $imagePath ) ;
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream) ;
-        return bitmap;
+        if($imagePath != null) {
+            InputStream inputStream = openHttpConnection($imagePath);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            return bitmap;
+        }
+        else
+            return null;
     }
 
     public InputStream openHttpConnection(String $imagePath) {
