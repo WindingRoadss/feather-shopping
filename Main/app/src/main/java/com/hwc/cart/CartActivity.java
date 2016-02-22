@@ -2,6 +2,7 @@ package com.hwc.cart;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -63,6 +64,7 @@ public class CartActivity extends Activity {
 
     public static JSONArray cart = null;
     public ListView list;
+    public ProgressDialog progDialog;
 
     public Button btnSend;
     public Button bt_request;
@@ -77,6 +79,10 @@ public class CartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+        progDialog = new ProgressDialog(this);
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setMessage("로딩중입니다......");
+        progDialog.show();
 
         txt_intprice = (TextView) findViewById(R.id.txt_intprice);
         //txt_intprice.setText("가격 : 테스트중");
@@ -194,6 +200,7 @@ public class CartActivity extends Activity {
             protected void onPostExecute(String result) {
                 myJSON = result;
                 showList();
+                progDialog.dismiss();
             }
         }
         GetDataJSON g = new GetDataJSON();
@@ -208,40 +215,6 @@ public class CartActivity extends Activity {
                 finish();
         }
         return super.onKeyDown(keyCode, event);
-    }
-
-    public void getCfrmRequest(String url) {
-        class GetDataJSON extends AsyncTask<String, Void, String> {
-            @Override
-            protected String doInBackground(String... params) {
-                String uri = params[0];
-                BufferedReader bufferedReader = null;
-                try {
-                    URL url = new URL(uri);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    StringBuilder sb = new StringBuilder();
-
-                    bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-                    String json;
-                    while ((json = bufferedReader.readLine()) != null) {
-                        sb.append(json + "\n");
-                    }
-
-                    return sb.toString().trim();
-
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                myJSON = result;
-            }
-        }
-        GetDataJSON g = new GetDataJSON();
-        g.execute(url);
     }
 
     public void executeTheadTest() {

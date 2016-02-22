@@ -35,30 +35,23 @@ public class PaidListView_custom extends BaseAdapter {
     public static int price_sum = 0;
     // ListView 내부 View들을 가르킬 변수들
 
-    public TextView txt_name;
-    public TextView txt_size;
-    public TextView txt_color;
-    public TextView txt_brand;
-    public TextView txt_price;
-    public TextView[] txt_yesorno = new TextView[pa.paid.length()];
-    public ImageView img_test;
 
-    public CheckBox chk_cfrm;
-    public String url_image;
     // 리스트 아이템 데이터를 저장할 배열
     public ArrayList<PaidListView_getset> mData;
-    public Bitmap btp_test;
+    public Bitmap btp_test = null;
     public boolean flag = false;
     public int get_position;
+
+
     public static ArrayList<Boolean> data_checked = new ArrayList<>(PaidActivity.paid.length());
-    public static ArrayList<String> data_yestxt = new ArrayList<>(PaidActivity.paid.length());
+
 
     public PaidListView_custom(Context context) {
         super();
         mContext = context;
         mData = new ArrayList<>();
-        for(int i=0;i<PaidActivity.paid.length();i++) {
-            data_checked.add(i,false);
+        for (int i = 0; i < PaidActivity.paid.length(); i++) {
+            data_checked.add(i, false);
         }
     }
 
@@ -100,29 +93,24 @@ public class PaidListView_custom extends BaseAdapter {
             convertView = ((LayoutInflater) mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                     .inflate(R.layout.paid_custom_list, null);
-
-            // 레이아웃이 메모리에 올라왔기 때문에 이를 이용하여 포함된 뷰들을 참조할 수 있습니다.
-            txt_name = (TextView) convertView.findViewById(R.id.txt_name);
-            txt_size = (TextView) convertView.findViewById(R.id.txt_size);
-            txt_color = (TextView) convertView.findViewById(R.id.txt_color);
-            txt_brand = (TextView) convertView.findViewById(R.id.txt_brand);
-            txt_price = (TextView) convertView.findViewById(R.id.txt_price);
-            txt_yesorno[position] = (TextView) convertView.findViewById(R.id.txt_yesorno);
-            img_test = (ImageView) convertView.findViewById(R.id.img_test);
-            chk_cfrm = (CheckBox) convertView.findViewById(R.id.chk_cfrm);
         }
+        // 레이아웃이 메모리에 올라왔기 때문에 이를 이용하여 포함된 뷰들을 참조할 수 있습니다.
+        final TextView txt_name = (TextView) convertView.findViewById(R.id.txt_name);
+        final TextView txt_size = (TextView) convertView.findViewById(R.id.txt_size);
+        final TextView txt_color = (TextView) convertView.findViewById(R.id.txt_color);
+        final TextView txt_brand = (TextView) convertView.findViewById(R.id.txt_brand);
+        final TextView txt_price = (TextView) convertView.findViewById(R.id.txt_price);
+        final ImageView img_test = (ImageView) convertView.findViewById(R.id.img_test);
+        final CheckBox chk_cfrm = (CheckBox) convertView.findViewById(R.id.chk_cfrm);
+        final TextView txt_brdel = (TextView) convertView.findViewById(R.id.txt_brdel);
+        final imageThread it = new imageThread();
+        //convertView = new NumberView( getContext(), getItem( position));
+
 
         // 받아온 position 값을 이용하여 배열에서 아이템을 가져온다.
-        lv_gst = mData.get(position);
+        lv_gst = getItem(position);
 
         // Tag를 이용하여 데이터와 뷰를 묶습니다.
-        txt_name.setTag(lv_gst);
-        txt_size.setTag(lv_gst);
-        txt_color.setTag(lv_gst);
-        txt_brand.setTag(lv_gst);
-        txt_price.setTag(lv_gst);
-        txt_yesorno[position].setTag(lv_gst);
-        img_test.setTag(lv_gst);
         chk_cfrm.setTag(lv_gst);
 
         // 데이터의 실존 여부를 판별합니다.
@@ -131,10 +119,11 @@ public class PaidListView_custom extends BaseAdapter {
             txt_name.setText(lv_gst.getName());
             txt_size.setText(lv_gst.getSize());
             txt_color.setText(lv_gst.getColor());
-            txt_yesorno[position].setText("처리 미완료");
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
-            imageThread it = new imageThread();
+            txt_brdel.setText(lv_gst.getBrdel());
+
+
             it.start();
             try {
                 //  메인 스레드는 작업 스레드가 이미지 작업을 가져올 때까지
@@ -148,18 +137,20 @@ public class PaidListView_custom extends BaseAdapter {
                 e.printStackTrace();
             }
 
+
             chk_cfrm.setChecked(((ListView) parent).isItemChecked(position));
             chk_cfrm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
                     if (checked) {
-                        data_checked.set(position, true);
                         flag = true;
+                        data_checked.set(position, true);
                     } else {
-                        data_checked.set(position, false);
                         flag = false;
+                        data_checked.set(position, false);
                     }
                 }
             });
+
         }
         // 완성된 아이템 뷰를 반환합니다.
         return convertView;
@@ -169,7 +160,6 @@ public class PaidListView_custom extends BaseAdapter {
     public void add(PaidListView_getset user) {
         mData.add(user);
     }
-
 
     class imageThread extends Thread {
         @Override
@@ -186,10 +176,5 @@ public class PaidListView_custom extends BaseAdapter {
                 i.printStackTrace();
             }
         }
-    }
-
-    private static class ViewHolder
-    {
-
     }
 }

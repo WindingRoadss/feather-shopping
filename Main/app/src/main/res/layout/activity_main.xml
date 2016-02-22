@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/mainbackground"
+    android:background="@drawable/mainlogin"
     android:scaleType="fitXY"
     tools:context="com.hwc.main.MainActivity">
 
@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/button_selector"
             android:text="Enter"
-            android:textSize="22dp"
+            android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
 
