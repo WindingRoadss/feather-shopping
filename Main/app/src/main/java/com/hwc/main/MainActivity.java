@@ -2,6 +2,7 @@ package com.hwc.main;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
     private String id, password;
     private ArrayList<String> arrayMemberIdName; //회원의 ID와 이름 저장
     private boolean mChecked = false;
-
+    public ProgressDialog progDialog;
     // SharedPrefence를 위한 멤버 변수
     private LoginSession loginSession;
     private HashMap<String, String> infoList = new HashMap<String, String>();
@@ -103,6 +104,7 @@ public class MainActivity extends Activity {
     class ThreadLogin extends Thread {
         @Override
         public void run() {
+            progressDialog();
             et_id = (EditText) findViewById(R.id.et_id);
             id = String.valueOf(et_id.getText());
             et_password = (EditText) findViewById(R.id.et_password);
@@ -110,7 +112,6 @@ public class MainActivity extends Activity {
             try {
                 arrayMemberIdName = ConnectDB.login(id, password);
                 Log.d("set ID Test", "try 전0" + arrayMemberIdName.get(0));
-                Log.d("set ID Test", "try 전1");
                 if (arrayMemberIdName.get(0) == "OK") { //login 성공
                     ConnectDB.setId(id);
                     ConnectDB.setName(arrayMemberIdName.get(1));
@@ -124,8 +125,10 @@ public class MainActivity extends Activity {
 
                     Intent intent = new Intent(getBaseContext(), SelectActivity.class);
                     startActivity(intent);
+                    progDialog.dismiss();
                 } else {
                     failedLogin();
+                    progDialog.dismiss();
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -134,6 +137,19 @@ public class MainActivity extends Activity {
             }
             mChecked = true;
         }
+    }
+
+    public void progressDialog() {
+        Handler mHandler = new Handler(Looper.getMainLooper());
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progDialog = new ProgressDialog(MainActivity.this);
+                progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progDialog.setMessage("로딩중입니다......");
+                progDialog.show();
+            }
+        }, 0);
     }
 
     public void failedLogin() {

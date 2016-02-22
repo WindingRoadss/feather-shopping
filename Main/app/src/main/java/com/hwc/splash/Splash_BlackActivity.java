@@ -25,9 +25,10 @@ public class Splash_BlackActivity extends Activity {
             public void run() {
                 Intent intent = new Intent(Splash_BlackActivity.this, MainActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
-        }, 1700);
+        }, 1000);
     }
 
     @Override
