@@ -103,6 +103,7 @@ public class PaidListView_custom extends BaseAdapter {
         final ImageView img_test = (ImageView) convertView.findViewById(R.id.img_test);
         final CheckBox chk_cfrm = (CheckBox) convertView.findViewById(R.id.chk_cfrm);
         final TextView txt_brdel = (TextView) convertView.findViewById(R.id.txt_brdel);
+        final TextView txt_prcnt = (TextView) convertView.findViewById(R.id.txt_prcnt);
 
         //convertView = new NumberView( getContext(), getItem( position));
 
@@ -122,6 +123,7 @@ public class PaidListView_custom extends BaseAdapter {
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
             txt_brdel.setText(lv_gst.getBrdel());
+            txt_brdel.setText(lv_gst.getPrcnt());
 
             imageThread it = new imageThread();
             it.start();

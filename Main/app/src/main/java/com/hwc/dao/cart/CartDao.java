@@ -58,6 +58,7 @@ public class CartDao {
         resultTags.add("PR_IMAGE");
         resultTags.add("PR_PRICE");
         resultTags.add("PR_SNUM");
+        resultTags.add("CA_PRCNT");
         HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
         return result;
     }

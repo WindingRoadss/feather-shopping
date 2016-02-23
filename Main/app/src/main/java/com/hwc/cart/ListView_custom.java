@@ -57,9 +57,8 @@ public class ListView_custom extends BaseAdapter {
         super();
         mContext = context;
         mData = new ArrayList<>();
-        /*for(int i=0;i<CartActivity.cart.length();i++) {
-            data_checked.add(i,false);
-        }*/
+        price_sum = 0;
+
         for(int i=0;i<CartActivity.rowLength;i++) {
             data_checked.add(i,false);
         }
@@ -138,6 +137,10 @@ public class ListView_custom extends BaseAdapter {
             txt_color.setText(lv_gst.getColor());
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
+            txt_eachsize.setText(lv_gst.getPrcnt());
+            Log.d(HWC, "price 값 : " + lv_gst.getPrice());
+            Log.d(HWC, "eachsize 값 : "+lv_gst.getPrcnt());
+
             imageThread it = new imageThread();
             it.start();
             try {
@@ -153,25 +156,31 @@ public class ListView_custom extends BaseAdapter {
             }
 
             for (int i = 0; i < CartActivity.rowLength; i++) {
-                count[i] = 0;
+                count[i] = Integer.valueOf(CartActivity.data_prcnt.get(i));
             }
             for (int i = 0; i < CartActivity.rowLength; i++) {
-                temp_sum[i] = 0;
+                temp_sum[i] = CartActivity.data_intprice.get(i) * Integer.valueOf(CartActivity.data_prcnt.get(i));
             }
             for (int i = 0; i < CartActivity.rowLength; i++) {
-                flag[i] = false;
+                flag[i] = true;
             }
 
-            chk_add.setChecked(((ListView) parent).isItemChecked(position));
+            //chk_add.setChecked(((ListView) parent).isItemChecked(position));
+            chk_add.setChecked(true);
+            for(int i = 0; i < CartActivity.rowLength; i++) {
+                data_checked.set(i, true);
+            }
+            //chk_add.setChecked(true);
             chk_add.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
                     if (checked) {
                         flag[position] = true;
                         data_checked.set(position, true);
                         Log.d(HWC, "[" + position + "번째 포지션의 체크 누름");
-                        count[position]++;
+                        price_sum += temp_sum[position];
+                 /*       count[position]++;
                         temp_sum[position] +=  ca.data_intprice.get(position);
-                        price_sum +=  ca.data_intprice.get(position);
+                        price_sum +=  ca.data_intprice.get(position);*/
                         CartActivity.setTextPrice(price_sum);
                         txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
@@ -182,9 +191,9 @@ public class ListView_custom extends BaseAdapter {
                         flag[position] = false;
                         data_checked.set(position, false);
                         Log.d(HWC, "[" + position + "번째 포지션의 체크 해제");
-                        count[position] = 0;
+                        //count[position] = Integer.valueOf(CartActivity.data_prcnt.get(position));
                         price_sum -= temp_sum[position];
-                        temp_sum[position] = 0;
+                        //temp_sum[position] = CartActivity.data_intprice.get(position) * Integer.valueOf(CartActivity.data_prcnt.get(position));
                         CartActivity.setTextPrice(price_sum);
                         txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);
@@ -203,7 +212,7 @@ public class ListView_custom extends BaseAdapter {
                         Log.d(HWC, "[" + position + "번째 포지션의 + 버튼 누름");
                         count[position]++;
                         temp_sum[position] += ca.data_intprice.get(position);
-                        price_sum +=  ca.data_intprice.get(position);
+                        price_sum += ca.data_intprice.get(position);
                         CartActivity.setTextPrice(price_sum);
                         txt_eacharr[position].setText(Integer.toString(count[position]));
                         Log.d(HWC, position + "번째 포지션의 price_sum : " + price_sum);

@@ -12,9 +12,10 @@ public class PaidListView_getset {
     private String price;
     private String snum;
     private String brdel;
+    private String prcnt;
 
 
-    PaidListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price, String _snum, String _brdel) {
+    PaidListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price, String _snum, String _brdel, String _prcnt) {
         name = _name;
         size = _size;
         color = _color;
@@ -23,7 +24,7 @@ public class PaidListView_getset {
         price = _price;
         snum = _snum;
         brdel = _brdel;
-
+        prcnt = _prcnt;
     }
 
 
@@ -57,6 +58,10 @@ public class PaidListView_getset {
 
     public String getBrdel() {
         return brdel;
+    }
+
+    public String getPrcnt() {
+        return prcnt;
     }
 }
 

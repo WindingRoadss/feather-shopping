@@ -59,12 +59,13 @@ public class PaidDao {
         resultTags.add("PR_PRICE");
         resultTags.add("PR_SNUM");
         resultTags.add("CA_BRDEL");
+        resultTags.add("CA_PRCNT");
         HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
         return result;
     }
 
     public HashMap<String, String> insertProductPaying(String serial
-            , String size, String color, String usid) throws ClientProtocolException, IOException {
+            , String size, String color, String usid, String prcnt) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/paid/insertToDeliveryFromPaid.php";
 
@@ -81,6 +82,8 @@ public class PaidDao {
         valueList.add(color);
         tagList.add("usid");
         valueList.add(usid);
+        tagList.add("prcnt");
+        valueList.add(prcnt);
 
 
         HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
@@ -96,7 +99,7 @@ public class PaidDao {
     }
 
     public HashMap<String, String> Bring(String serial
-            , String size, String color, String usid) throws ClientProtocolException, IOException {
+            , String size, String color, String usid, String prcnt) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/paid/Bring.php";
 
@@ -113,6 +116,8 @@ public class PaidDao {
         valueList.add(color);
         tagList.add("usid");
         valueList.add(usid);
+        tagList.add("prcnt");
+        valueList.add(prcnt);
 
 
         HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);

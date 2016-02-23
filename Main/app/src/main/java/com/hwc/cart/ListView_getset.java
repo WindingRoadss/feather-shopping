@@ -11,8 +11,9 @@ public class ListView_getset {
     private String image;
     private String price;
     private String snum;
+    private String prcnt;
 
-    ListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price, String _snum) {
+    ListView_getset(String _name, String _size, String _color, String _brand, String _image, String _price, String _snum, String _prcnt) {
         name = _name;
         size = _size;
         color = _color;
@@ -20,6 +21,7 @@ public class ListView_getset {
         image = _image;
         price = _price;
         snum = _snum;
+        prcnt = _prcnt;
     }
 
 
@@ -51,4 +53,7 @@ public class ListView_getset {
         return snum;
     }
 
+    public String getPrcnt() {
+        return prcnt;
+    }
 }

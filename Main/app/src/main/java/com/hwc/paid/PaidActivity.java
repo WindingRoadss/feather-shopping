@@ -50,6 +50,7 @@ public class PaidActivity extends Activity {
     public static final String TAG_PRICE = "PR_PRICE";
     public static final String TAG_SNUM = "PR_SNUM";
     public static final String TAG_BRDEL = "CA_BRDEL";
+    public static final String TAG_PRCNT = "CA_PRCNT";
     public ArrayList<String> data_name = new ArrayList<>();
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
@@ -58,6 +59,7 @@ public class PaidActivity extends Activity {
     public ArrayList<String> data_price = new ArrayList<>();
     public ArrayList<String> data_snum = new ArrayList<>();
     public ArrayList<String> data_brdel = new ArrayList<>();
+    public ArrayList<String> data_prcnt = new ArrayList<>();
 
     public Button bt_bring;
     public Button bt_delivery;
@@ -84,6 +86,8 @@ public class PaidActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paid);
+
+        rowLength = 0;
 
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -173,33 +177,32 @@ public class PaidActivity extends Activity {
 
         //*JSON 언어*//*
         //for (int i = 0; i < cart.length(); i++) {
-        try {
-            for (int i = 0; i < rowLength; i++) {
-                //JSONObject c = paid.getJSONObject(i);
-                data_name.add(hashMapResult[i].get(TAG_NAME));
-                data_size.add(hashMapResult[i].get(TAG_SIZE));
-                data_color.add(hashMapResult[i].get(TAG_COLOR));
-                data_brand.add(hashMapResult[i].get(TAG_BRAND));
-                data_image.add(hashMapResult[i].get(TAG_IMAGE));
-                data_price.add(hashMapResult[i].get(TAG_PRICE));
-                data_snum.add(hashMapResult[i].get(TAG_SNUM));
-                data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
+     try {
+        for (int i = 0; i < rowLength; i++) {
+            //JSONObject c = paid.getJSONObject(i);
+            data_name.add(hashMapResult[i].get(TAG_NAME));
+            data_size.add(hashMapResult[i].get(TAG_SIZE));
+            data_color.add(hashMapResult[i].get(TAG_COLOR));
+            data_brand.add(hashMapResult[i].get(TAG_BRAND));
+            data_image.add(hashMapResult[i].get(TAG_IMAGE));
+            data_price.add(hashMapResult[i].get(TAG_PRICE));
+            data_snum.add(hashMapResult[i].get(TAG_SNUM));
+            data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
+            data_prcnt.add(hashMapResult[i].get(TAG_PRCNT));
 
-                Log.d("showList i", Integer.toString(i));
-                Log.d("showList", hashMapResult[i].get(TAG_PRICE));
-            }
+            Log.d("showList i", Integer.toString(i));
+            Log.d("showList", hashMapResult[i].get(TAG_PRICE));
         }
-        catch (Exception e)
-        {
-            Toast.makeText(getApplicationContext(), "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
-        }
+     }catch(Exception e){
+         Toast.makeText(PaidActivity.this, "등록된데이터가 없습니다.", Toast.LENGTH_SHORT).show();
+     }
         Log.d(HWC, "data_price의 값 : " + data_price);
 
         Log.d(HWC, "snum의 값 : " + data_snum);
 
         for (int i = 0; i < rowLength; i++) {
             PaidListView_getset u = new PaidListView_getset(data_name.get(i), data_size.get(i), data_color.get(i),
-                    data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_brdel.get(i));
+                    data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_brdel.get(i), data_prcnt.get(i));
             adapter.add(u);
         }
         ifViewed = true;
@@ -361,7 +364,9 @@ public class PaidActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
-
+                Intent intent = new Intent(getBaseContext(), PaidActivity.class);
+                startActivity(intent);
+                finish();
             }
         }
         TheadTest theadTest = new TheadTest();
@@ -383,7 +388,9 @@ public class PaidActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
-
+                Intent intent = new Intent(getBaseContext(), PaidActivity.class);
+                startActivity(intent);
+                finish();
             }
         }
         TheadTest theadTest = new TheadTest();
@@ -392,24 +399,32 @@ public class PaidActivity extends Activity {
 
     public void insertDelivery() throws IOException {
         HashMap<String, String>[] result = new HashMap[rowLength];
+        int count = 0;
         //boolean queryResult = false;
         for (int i = 0; i< rowLength; i++){
             result[i] = new HashMap<String, String>();
             //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if(PaidListView_custom.data_checked.get(i) == true)
-                result[i] = PaidDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
+            if(PaidListView_custom.data_checked.get(i) == true) {
+                result[i] = PaidDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId, data_prcnt.get(i));
+                count++;
+            }
         }
+        rowLength -= count;
     }
 
     public void insertBring() throws IOException {
         HashMap<String, String>[] result = new HashMap[rowLength];
+        int count = 0;
         //boolean queryResult = false;
         for (int i = 0; i< rowLength; i++){
             result[i] = new HashMap<String, String>();
             //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if(PaidListView_custom.data_checked.get(i) == true)
-                result[i] = PaidDao.Bring(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
+            if(PaidListView_custom.data_checked.get(i) == true) {
+                result[i] = PaidDao.Bring(data_snum.get(i), data_size.get(i), data_color.get(i), userId, data_prcnt.get(i));
+                count++;
+            }
         }
+        rowLength -= count;
     }
 
     class ThreadSelectProductInfo extends Thread {

@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -50,6 +51,7 @@ public class CartActivity extends Activity {
     public static final String TAG_IMAGE = "PR_IMAGE";
     public static final String TAG_PRICE = "PR_PRICE";
     public static final String TAG_SNUM = "PR_SNUM";
+    public static final String TAG_PRCNT = "CA_PRCNT";
     public ArrayList<String> data_name = new ArrayList<>();
     public ArrayList<String> data_size = new ArrayList<>();
     public ArrayList<String> data_color = new ArrayList<>();
@@ -57,6 +59,8 @@ public class CartActivity extends Activity {
     public ArrayList<String> data_image = new ArrayList<>();
     public ArrayList<String> data_price = new ArrayList<>();
     public ArrayList<String> data_snum = new ArrayList<>();
+    public static ArrayList<String> data_prcnt = new ArrayList<>();
+
 
     public static ArrayList<Integer> data_intprice = new ArrayList<>();
 
@@ -91,6 +95,11 @@ public class CartActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+
+        rowLength = 0;
+        data_intprice.clear();
+        data_prcnt.clear();
+
 
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -162,6 +171,7 @@ public class CartActivity extends Activity {
                 data_image.add(hashMapResult[i].get(TAG_IMAGE));
                 data_price.add(hashMapResult[i].get(TAG_PRICE));
                 data_snum.add(hashMapResult[i].get(TAG_SNUM));
+                data_prcnt.add(hashMapResult[i].get(TAG_PRCNT));
                 data_intprice.add(Integer.parseInt(data_price.get(i)));
             }
             //Log.d("showList i", Integer.toString(i));
@@ -172,6 +182,14 @@ public class CartActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
+		
+		for(int i = 0 ; i < rowLength; i++)
+        {
+            adapter.price_sum = adapter.price_sum + (data_intprice.get(i) * Integer.valueOf(data_prcnt.get(i)));
+            Log.d("minhwan", "price_sum의 값 : " + adapter.price_sum);
+            Log.d("minhwan", "data_intprice.get(i)의 값 : "+ data_intprice.get(i));
+            Log.d("minhwan", "Integer.valueOf(CartActivity.data_prcnt.get(i))의 값 : "+ Integer.valueOf(data_prcnt.get(i)));
+        }
 
         //Log.d(HWC, "data_price의 값 : " + data_price);
 
@@ -181,7 +199,7 @@ public class CartActivity extends Activity {
 
         for (int i = 0; i < rowLength; i++) {
             ListView_getset u = new ListView_getset(data_name.get(i), data_size.get(i),
-                    data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i));
+                    data_color.get(i), data_brand.get(i), data_image.get(i), data_price.get(i), data_snum.get(i), data_prcnt.get(i));
             adapter.add(u);
         }
     }
@@ -350,13 +368,16 @@ public class CartActivity extends Activity {
 
     public void insertPay() throws IOException {
         HashMap<String, String>[] result = new HashMap[rowLength];
-        //boolean queryResult = false;
+        int count = 0;
         for (int i = 0; i < rowLength; i++) {
             result[i] = new HashMap<String, String>();
-            //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if (ListView_custom.data_checked.get(i) == true)
+
+            if (ListView_custom.data_checked.get(i) == true) {
                 result[i] = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
+                count ++;
+            }
         }
+        rowLength -= count;
     }
 
     class ThreadSelectProductInfo extends Thread {
