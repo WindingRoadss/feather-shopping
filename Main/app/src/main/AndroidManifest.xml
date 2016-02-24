@@ -40,6 +40,7 @@
         <activity android:name="com.hwc.splash.Splash_BlackActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SelectActivity" />
+        <activity android:name=".SelectActivity_customer" />
         <activity android:name="com.hwc.nfc.NFCActivity" />
         <activity android:name="com.hwc.cart.CartActivity" />
         <activity android:name="com.hwc.res.ResActivity" />

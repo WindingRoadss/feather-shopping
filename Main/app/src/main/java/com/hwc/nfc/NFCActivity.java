@@ -22,6 +22,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,6 +37,7 @@ import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.main.R;
+import com.hwc.shared.LoginSession;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -110,6 +112,9 @@ public class NFCActivity extends Activity {
     private boolean boolIsUsedFromBundle;
     private boolean boolIsEmptyChipFromBundle;
     private Bundle bundle;
+
+    private LoginSession loginSession;
+    private HashMap<String, String> infoListFormPref;
 
     private AdapterView.OnItemSelectedListener onItemSelectedListenerBrand = new AdapterView.OnItemSelectedListener() {
 
@@ -404,10 +409,12 @@ public class NFCActivity extends Activity {
         btnShowSelectedPrImage.setOnClickListener(onClickListenerShowPrImage);
         btnUploadSelectedPrImage.setOnClickListener(onClickListenerUploadPrImage);
 
-
         // Bundle로 넘겨받은 값 Set
         tvTagId.setText(strTagIdFromBundle);
         boolIsUsed = boolIsUsedFromBundle;
+
+        loginSession = new LoginSession(getApplicationContext());
+        infoListFormPref = loginSession.getPreferencesResultHashMap();
 
         if(boolIsEmptyChipFromBundle == true) // 비어있는 칩이면 == true
             execForUnusedTagThread();
@@ -511,10 +518,12 @@ public class NFCActivity extends Activity {
                 ArrayList<String> itemList = null;
                 itemList = new ArrayList<String>();
                 itemList.add("");
+                itemList.add(infoListFormPref.get("brand"));
 
                 for(int i = 0; i < result.length; i++)
                     Log.d("brand list", result[i].get("brand"));
 
+                /*
                 for(HashMap<String, String> hashMap : result) {
                     if (hashMap.get("status") == "OK") {
                         itemList.add(hashMap.get("brand")); // 브랜드 리스트
@@ -523,6 +532,7 @@ public class NFCActivity extends Activity {
                         printToastInThread("Fail");
                     }
                 }
+                */
 
                 final ArrayAdapter<String> adapterBrand = new ArrayAdapter<String>(NFCActivity.this,
                         android.R.layout.simple_spinner_item, itemList);
@@ -1191,6 +1201,17 @@ public class NFCActivity extends Activity {
 
     private void deleteItemsInSpin(Spinner spinner) {
         spinner.setAdapter(null);
+    }
+
+    private void deleteSpinnerItemsExceptSelected(Spinner spinner, String selectedItem) {
+        ArrayList<String> itemList = null;
+        itemList = new ArrayList<String>();
+        itemList.add("");
+        itemList.add(selectedItem);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(NFCActivity.this,
+                    android.R.layout.simple_spinner_item, itemList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     private void disableSpinner(Spinner spinner) {

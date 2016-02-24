@@ -23,7 +23,7 @@
             android:hint="아이디"
             android:lines="1"
             android:singleLine="true"
-            android:text="dbmaster"
+            android:text="gapadmin"
             android:typeface="sans" />
 
         <EditText
@@ -38,7 +38,7 @@
             android:inputType="textPassword"
             android:lines="1"
             android:singleLine="true"
-            android:text="Rltxjf11"
+            android:text="123456789"
             android:typeface="sans" />
 
     </LinearLayout>

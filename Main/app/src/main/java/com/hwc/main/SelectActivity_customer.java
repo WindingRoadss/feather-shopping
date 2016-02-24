@@ -9,23 +9,32 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.hwc.cart.CartActivity;
-import com.hwc.nfc.NFCSplash;
 import com.hwc.paid.PaidActivity;
 import com.hwc.shared.LoginSession;
 import com.hwc.tagging.TaggingSplash;
 
 import java.util.HashMap;
 
-public class SelectActivity extends Activity {
+public class SelectActivity_customer extends Activity {
     public static ProgressDialog progDialog;
     private TextView tvUserName;
     private Button btnLogout;
     private LoginSession loginSession;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select);
+/*
+        Button btnNFCInfo = (Button) findViewById(R.id.btnNFCInfo);
+        btnNFCInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(SelectActivity_customer.this, NFCSplash.class);
+                //Intent intent = new Intent(SelectActivity.this, NFCActivity.class);
+                startActivity(intent);
+            }
+        });*/
 
         loginSession = new LoginSession(getApplicationContext());
         HashMap<String, String> infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -36,17 +45,6 @@ public class SelectActivity extends Activity {
         btnLogout = (Button) findViewById(R.id.btnLogout);
 
         tvUserName.setText(userName);
-
-        Button btnNFCInfo = (Button) findViewById(R.id.btnNFCInfo);
-        btnNFCInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Intent intent = new Intent(SelectActivity.this, NFCSplash.class);
-                //Intent intent = new Intent(SelectActivity.this, NFCActivity.class);
-                startActivity(intent);
-            }
-        });
 
         Button btnTaggingProduct = (Button) findViewById(R.id.btnTagging);
         btnTaggingProduct.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +60,7 @@ public class SelectActivity extends Activity {
         btnCartInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progDialog = new ProgressDialog(SelectActivity.this);
+                progDialog = new ProgressDialog(SelectActivity_customer.this);
                 progDialog.setMessage("로딩중입니다......");
                 progDialog.show();
                 Intent intent = new Intent(getBaseContext(), CartActivity.class);
@@ -75,7 +73,7 @@ public class SelectActivity extends Activity {
         btnPaying.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progDialog = new ProgressDialog(SelectActivity.this);
+                progDialog = new ProgressDialog(SelectActivity_customer.this);
                 progDialog.setMessage("로딩중입니다......");
                 progDialog.show();
                 Intent intent = new Intent(getBaseContext(), PaidActivity.class);

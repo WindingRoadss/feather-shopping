@@ -51,6 +51,8 @@ public class LoginDao {
         // resultTags는 column 이름
         ArrayList<String> resultTags = new ArrayList<String>();
         resultTags.add("admin");
+        resultTags.add("name");
+        resultTags.add("brand");
 
         HashMap<String, String>[] result = commonDao.getResult(response, resultTags);
         return result;

@@ -1,7 +1,6 @@
 package com.hwc.shared;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +26,9 @@ public class LoginSession {
 
         keyList = new ArrayList<String>();
         keyList.add("id");
+        keyList.add("isAdmin");
+        keyList.add("brand");
+        keyList.add("name");
     }
 
     public LoginSession(Context context, HashMap<String, String> infoList) {
@@ -39,6 +41,9 @@ public class LoginSession {
 
         keyList = new ArrayList<String>();
         keyList.add("id");
+        keyList.add("isAdmin");
+        keyList.add("brand");
+        keyList.add("name");
 
         // 필요한 정보 put
         this.infoList = infoList;
@@ -64,3 +69,4 @@ public class LoginSession {
     }
 
 }
+

@@ -100,7 +100,6 @@ public class CartActivity extends Activity {
         data_intprice.clear();
         data_prcnt.clear();
 
-
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
         userId = infoListFormPref.get("id");

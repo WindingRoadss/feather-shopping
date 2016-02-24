@@ -25,7 +25,6 @@ import com.hwc.shared.LoginSession;
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends Activity {
@@ -55,19 +54,29 @@ public class MainActivity extends Activity {
         loginDao = new LoginDao();
 
         loginSession = new LoginSession(getApplicationContext());
+
+        loginSession.clearPreferences(); // 자동 로그인 취소
+
+        et_id = (EditText) findViewById(R.id.et_id);
+        et_password = (EditText) findViewById(R.id.et_password);
+
+        et_id.setText("");
+        et_password.setText("");
+
         infoListFormPref = loginSession.getPreferencesResultHashMap();
 
-        String test = infoListFormPref.get("id");
-        Log.d("auto login", test);
-        Log.d("auto login size", Integer.toString(test.length()));
-
-        loginSession.clearPreferences();
-
-        if (loginSession.getPreferencesResultHashMap().get("id").length() != 0) { // id가 10글자를 넘어가면
-            Log.d("auto login", loginSession.getPreferencesResultHashMap().get("id"));
-            Intent intent = new Intent(getBaseContext(), SelectActivity.class);
-            startActivity(intent);
-            finish();
+        if (infoListFormPref.get("id").length() != 0) { // id가 10글자를 넘어가면
+            if(infoListFormPref.get("isAdmin").equals("1")) { // 관리자인 경우
+                Log.d("auto login", loginSession.getPreferencesResultHashMap().get("id"));
+                Intent intent = new Intent(getBaseContext(), SelectActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else { // 사용자인 경우
+                Intent intent = new Intent(getBaseContext(), SelectActivity_customer.class);
+                startActivity(intent);
+                finish();
+            }
         }
 
 
@@ -86,9 +95,7 @@ public class MainActivity extends Activity {
                         new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT));
                 mProgress.show();
-                et_id = (EditText) findViewById(R.id.et_id);
                 id = String.valueOf(et_id.getText());
-                et_password = (EditText) findViewById(R.id.et_password);
                 id = String.valueOf(et_id.getText());
 
                 if (commonDao.isNetworkAvailable()) {
@@ -130,16 +137,25 @@ public class MainActivity extends Activity {
 
                         // SharedPreference
                         infoList.put("id", id);
+                        infoList.put("isAdmin", hashMapLoginResult[0].get("admin"));
+                        //infoList.put("username", hashMapLoginResult[0].get("name"));
+                        infoList.put("name", hashMapLoginResult[0].get("name"));
+                        if(hashMapLoginResult[0].get("brand") != null)
+                            infoList.put("brand", hashMapLoginResult[0].get("brand"));
+
                         loginSession = new LoginSession(getApplicationContext(), infoList);
                         infoListFormPref = loginSession.getPreferencesResultHashMap();
                         Log.d("shared pref", infoListFormPref.get("id"));
+                        Log.d("shared pref",infoListFormPref.get("name"));
 
                         if (hashMapLoginResult[0].get("admin").equals("1")) { // 관리자인 경우
                             Intent intent = new Intent(getBaseContext(), SelectActivity.class);
                             startActivity(intent);
+                            finish();
                         } else {
-                            Intent intent = new Intent(getBaseContext(), SelectActivity.class);
+                            Intent intent = new Intent(getBaseContext(), SelectActivity_customer.class);
                             startActivity(intent);
+                            finish();
                         }
 
                         progDialog.dismiss();
@@ -179,7 +195,7 @@ public class MainActivity extends Activity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-               // Toast.makeText(getBaseContext(), "로그인에 실패하였습니다", Toast.LENGTH_LONG).show();
+                // Toast.makeText(getBaseContext(), "로그인에 실패하였습니다", Toast.LENGTH_LONG).show();
                 Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
             }
         }, 0);
@@ -215,3 +231,5 @@ public class MainActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 }
+
+
