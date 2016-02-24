@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hwc.dao.common.CommonDao;
+import com.hwc.dao.login.LoginDao;
 import com.hwc.shared.LoginSession;
 
 import org.apache.http.client.ClientProtocolException;
@@ -32,7 +34,7 @@ public class MainActivity extends Activity {
     public Button bt_enter;
     public Button bt_karttemp;
     private String id, password;
-    private ArrayList<String> arrayMemberIdName; //회원의 ID와 이름 저장
+    private HashMap<String, String>[] hashMapLoginResult; //회원의 ID와 이름 저장
     private boolean mChecked = false;
     public ProgressDialog progDialog;
     // SharedPrefence를 위한 멤버 변수
@@ -40,12 +42,17 @@ public class MainActivity extends Activity {
     private HashMap<String, String> infoList = new HashMap<String, String>();
     private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
 
+    private LoginDao loginDao;
+    private CommonDao commonDao;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ConnectDB.setActivity(this); // 네트워크 연결확인 하기 위한
-        ConnectDB.deleteAllActList(); // 남아있는 activity 삭제하고 시작
+        commonDao = new CommonDao();
+        commonDao.setCurrentActivity(this);
+
+        loginDao = new LoginDao();
 
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -54,7 +61,7 @@ public class MainActivity extends Activity {
         Log.d("auto login", test);
         Log.d("auto login size", Integer.toString(test.length()));
 
-        //loginSession.clearPreferences();
+        loginSession.clearPreferences();
 
         if (loginSession.getPreferencesResultHashMap().get("id").length() != 0) { // id가 10글자를 넘어가면
             Log.d("auto login", loginSession.getPreferencesResultHashMap().get("id"));
@@ -84,7 +91,7 @@ public class MainActivity extends Activity {
                 et_password = (EditText) findViewById(R.id.et_password);
                 id = String.valueOf(et_id.getText());
 
-                if (ConnectDB.isNetworkAvailable()) {
+                if (commonDao.isNetworkAvailable()) {
                     t_login.start();
                     mProgress.dismiss();
                 } else
@@ -113,24 +120,36 @@ public class MainActivity extends Activity {
             et_password = (EditText) findViewById(R.id.et_password);
             password = String.valueOf(et_password.getText());
             try {
-                arrayMemberIdName = ConnectDB.login(id, password);
-                Log.d("set ID Test", "try 전0" + arrayMemberIdName.get(0));
-                if (arrayMemberIdName.get(0) == "OK") { //login 성공
-                    ConnectDB.setId(id);
-                    ConnectDB.setName(arrayMemberIdName.get(1));
-                    ConnectDB.setEmail(arrayMemberIdName.get(2));
+                hashMapLoginResult = loginDao.selectLoginUserInfo(id, password);
+                //Log.d("set ID Test", "try 전0" + arrayMemberIdName.get(0));
+                if(hashMapLoginResult != null) {
+                    if (hashMapLoginResult[0].get("status") == "OK") { //login 성공
+                        //ConnectDB.setId(id);
+                        //ConnectDB.setName(arrayMemberIdName.get(1));
+                        //ConnectDB.setEmail(arrayMemberIdName.get(2));
 
-                    // SharedPreference
-                    infoList.put("id", id);
-                    loginSession = new LoginSession(getApplicationContext(), infoList);
-                    infoListFormPref = loginSession.getPreferencesResultHashMap();
-                    Log.d("shared pref", infoListFormPref.get("id"));
+                        // SharedPreference
+                        infoList.put("id", id);
+                        loginSession = new LoginSession(getApplicationContext(), infoList);
+                        infoListFormPref = loginSession.getPreferencesResultHashMap();
+                        Log.d("shared pref", infoListFormPref.get("id"));
 
-                    Intent intent = new Intent(getBaseContext(), SelectActivity.class);
-                    startActivity(intent);
-                    progDialog.dismiss();
-                } else {
-                    failedLogin();
+                        if (hashMapLoginResult[0].get("admin").equals("1")) { // 관리자인 경우
+                            Intent intent = new Intent(getBaseContext(), SelectActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(getBaseContext(), SelectActivity.class);
+                            startActivity(intent);
+                        }
+
+                        progDialog.dismiss();
+                    } else {
+                        failedLogin(hashMapLoginResult[0].get("message"));
+                        progDialog.dismiss();
+                    }
+                }
+                else {
+                    failedLogin("로그인 정보를 다시 확인해주세요");
                     progDialog.dismiss();
                 }
             } catch (ClientProtocolException e) {
@@ -155,12 +174,13 @@ public class MainActivity extends Activity {
         }, 0);
     }
 
-    public void failedLogin() {
+    public void failedLogin(final String message) {
         Handler mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getBaseContext(), "로그인에 실패하였습니다", Toast.LENGTH_LONG).show();
+               // Toast.makeText(getBaseContext(), "로그인에 실패하였습니다", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
             }
         }, 0);
     }
