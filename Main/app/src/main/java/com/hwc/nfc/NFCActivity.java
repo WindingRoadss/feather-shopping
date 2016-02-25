@@ -92,6 +92,7 @@ public class NFCActivity extends Activity {
     private LoginSession loginSession;
     private HashMap<String, String> infoListFormPref;
 
+    // Brand 리스트 스피너에서 클릭 했을 시 나타나는 event 정의
     private AdapterView.OnItemSelectedListener onItemSelectedListenerBrand = new AdapterView.OnItemSelectedListener() {
 
         @Override
@@ -122,6 +123,7 @@ public class NFCActivity extends Activity {
 
     };
 
+    // 상품 정보 리스트 스피너에서 클릭 했을 시 나타나는 event 정의
     private AdapterView.OnItemSelectedListener onItemSelectedListenerProductName = new AdapterView.OnItemSelectedListener() {
 
         @Override
@@ -152,6 +154,7 @@ public class NFCActivity extends Activity {
 
     };
 
+    // 시리얼 넘버 리스트 스피너에서 클릭 했을 시 나타나는 event 정의
     private AdapterView.OnItemSelectedListener onItemSelectedListenerSerial = new AdapterView.OnItemSelectedListener() {
 
         @Override
@@ -182,6 +185,7 @@ public class NFCActivity extends Activity {
 
     };
 
+    // 사이즈 리스트 스피너에서 클릭 했을 시 나타나는 event 정의
     private AdapterView.OnItemSelectedListener onItemSelectedListenerSize = new AdapterView.OnItemSelectedListener() {
 
         @Override
@@ -212,6 +216,7 @@ public class NFCActivity extends Activity {
 
     };
 
+    // 색상 리스트 스피너에서 클릭 했을 시 나타나는 event 정의
     private AdapterView.OnItemSelectedListener onItemSelectedListenerColor = new AdapterView.OnItemSelectedListener() {
 
         @Override
@@ -242,6 +247,7 @@ public class NFCActivity extends Activity {
 
     };
 
+    // 저장 버튼 눌렀을 때 나타는 event 정의
     View.OnClickListener onClickListenerSave = new View.OnClickListener(){
         public void onClick(View v) {
 
@@ -260,12 +266,12 @@ public class NFCActivity extends Activity {
         }
     };
 
+    // 이미지 불러오기 버튼 눌렀을 때 나타는 event 정의
     View.OnClickListener onClickListenerShowPrImage = new View.OnClickListener(){
         public void onClick(View v) {
 
             if (commonDao.isNetworkAvailable()) {
                 Toast.makeText(getBaseContext(), "갤러리로 연결합니다", Toast.LENGTH_SHORT).show();
-                //int PICK_IMAGE_REQUEST = 1;
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -278,6 +284,7 @@ public class NFCActivity extends Activity {
         }
     };
 
+    // 이미지 업로드 버튼 눌렀을 때 나타는 event 정의
     View.OnClickListener onClickListenerUploadPrImage = new View.OnClickListener(){
         public void onClick(View v) {
 
@@ -292,7 +299,7 @@ public class NFCActivity extends Activity {
         }
     };
 
-    // 갤러리에서 정보 가져온다
+    // 단말기 갤러리에서 정보 가져온다
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -348,15 +355,17 @@ public class NFCActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc);
 
+        // 이전 액티비티에서 전송되는 bundle 정보 받아온다
         bundle = getIntent().getExtras();
         strTagIdFromBundle = bundle.getString("tagId");
         boolIsUsedFromBundle = bundle.getBoolean("boolIsUsed");
         boolIsEmptyChipFromBundle = bundle.getBoolean("boolIsEmptyChip");
 
+        // Database Access Object 생성
         commonDao = new CommonDao();
         commonDao.setCurrentActivity(this);
-
         nfcDao = new NFCDao(); // DB 접근 객체 생성
+
         tvTagId = (TextView) findViewById(R.id.tvTagId);
         spinBrand = (Spinner) findViewById(R.id.spinBrand);
         spinProductName = (Spinner) findViewById(R.id.spinProductName);
@@ -367,8 +376,6 @@ public class NFCActivity extends Activity {
         tvStock = (TextView) findViewById(R.id.tvStock);
         btnSave = (Button)findViewById(R.id.btnSave);
         btnShowSelectedPrImage = (Button)findViewById(R.id.btnShowSelectedPrImage);
-
-
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
         spinBrand.setOnItemSelectedListener(onItemSelectedListenerBrand);
@@ -383,6 +390,7 @@ public class NFCActivity extends Activity {
         // Bundle로 넘겨받은 값 Set
         boolIsUsed = boolIsUsedFromBundle;
 
+        // 로그인 세션 정보 가져온다
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
 
@@ -403,6 +411,7 @@ public class NFCActivity extends Activity {
 
     }
 
+    // Tag ID insert 하는 Thread
     class ThreadInsertTag extends Thread {
         @Override
         public void run() {
@@ -418,11 +427,11 @@ public class NFCActivity extends Activity {
                     if (result.get("status") == "OK") {
                         handler.post(new Runnable() {
                             public void run() {
-                                printToastInThread("insertTag Success" + " Message : " + result.get("message"));
+                                printToastInThread(result.get("message"));
                             }
                         });
                     } else {
-                        printToastInThread("insertTag Fail" + " Message : " + result.get("message"));
+                        printToastInThread(result.get("message"));
                     }
                 }
             } catch (ClientProtocolException e) {
@@ -434,6 +443,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 브랜드 정보 가져오는 Thread
     class ThreadSelectAllBrand extends Thread {
         @Override
         public void run() {
@@ -444,7 +454,6 @@ public class NFCActivity extends Activity {
                 Handler handler = new Handler(Looper.getMainLooper());
 
                 HashMap<String, String>[] result = nfcDao.selectAllBrand();
-                //hashMapBrandList = result;
                 ArrayList<String> itemList = null;
                 itemList = new ArrayList<String>();
                 itemList.add("");
@@ -489,6 +498,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 이름 정보 가져오는 스레드
     class ThreadSelectProductName extends Thread {
         @Override
         public void run() {
@@ -508,7 +518,7 @@ public class NFCActivity extends Activity {
 
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
-                            itemList.add(hashMap.get("name")); // 브랜드 리스트
+                            itemList.add(hashMap.get("name"));
                         } else {
                             printToastInThread("selectProductName Fail");
                         }
@@ -517,8 +527,6 @@ public class NFCActivity extends Activity {
                     final ArrayAdapter<String> adapterProductName = new ArrayAdapter<String>(NFCActivity.this,
                             android.R.layout.simple_spinner_item, itemList);
                     adapterProductName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-                    Log.d("ThreadSelectProductName", "executed 1");
 
                     handler.post(new Runnable() {
                         public void run() {
@@ -559,6 +567,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 시리얼 넘버 정보 가져오는 스레드
     class ThreadSelectSerial extends Thread {
         @Override
         public void run() {
@@ -577,7 +586,7 @@ public class NFCActivity extends Activity {
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
-                            itemList.add(hashMap.get("serial")); // 브랜드 리스트
+                            itemList.add(hashMap.get("serial"));
                         } else {
                             printToastInThread("selectSerial Fail");
                         }
@@ -623,6 +632,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 사이즈 정보 가져오는 스레드
     class ThreadSelectSize extends Thread {
         @Override
         public void run() {
@@ -685,6 +695,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 색상 정보 가져오는 스레드
     class ThreadSelectColor extends Thread {
         @Override
         public void run() {
@@ -745,6 +756,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 가격 및 재고 정보 가져오는 스레드
     class ThreadSelectPriceStock extends Thread {
         @Override
         public void run() {
@@ -790,6 +802,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 이름 정보 가져오는 스레드
     class ThreadUpdateProductInfo extends Thread {
         @Override
         public void run() {
@@ -800,7 +813,6 @@ public class NFCActivity extends Activity {
                 Handler handler = new Handler(Looper.getMainLooper());
                 String tagId = strTagIdFromBundle; // tagId 가져온다
                 String extName = null, noSpacePrName = null;
-
 
                 if(strSelecteProductImagName != null)
                     extName = extractExtName(strSelecteProductImagName);
@@ -830,6 +842,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // 상품 정보 전체를 가져오는 스레드
     class ThreadSelectProductInfo extends Thread {
         @Override
         public void run() {
@@ -881,6 +894,7 @@ public class NFCActivity extends Activity {
         }
     }
 
+    // NFC 칩의 사용 여부 가져오는 스레드
     class ThreadSelectIsUsed extends Thread {
         @Override
         public void run() {
@@ -895,7 +909,6 @@ public class NFCActivity extends Activity {
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
-                            //printToastInThread("ThreadSelectIsUsed Success");
                             if(hashMap.get("used").equals("1"))
                                 boolIsUsed = true;
                             else
@@ -914,7 +927,7 @@ public class NFCActivity extends Activity {
         }
     }
 
-    // 이미지 불러와준다
+    // 저장된 상품 이미지 가져오는 스레드
     class ThreadLoadProductImage extends Thread {
         @Override
         public void run() {
@@ -952,6 +965,7 @@ public class NFCActivity extends Activity {
         }, 0);
     }
 
+    // 사용되지 않은 NFC 칩인 경우 실행되는 스레드 실행
     public void execForUnusedTagThread() {
 
         // Looper.getMainLooper() : main UI 접근하기 위함
@@ -985,6 +999,7 @@ public class NFCActivity extends Activity {
 
     }
 
+    // 사용된 NFC 칩인 경우 실행되는 스레드 실행
     public void execForUsedTagThread() throws InterruptedException {
 
         threadSelectProductInfo = new ThreadSelectProductInfo();
@@ -1047,6 +1062,7 @@ public class NFCActivity extends Activity {
 
     }
 
+    // 테스트 용
     public void threadTest() {
 
         // 최초일 때만 InsertTag
@@ -1101,6 +1117,7 @@ public class NFCActivity extends Activity {
 
     }
 
+    // Spinner Adapter 초기화
     private void deleteItemsInSpin(Spinner spinner) {
         spinner.setAdapter(null);
     }
@@ -1125,6 +1142,7 @@ public class NFCActivity extends Activity {
         spinner.setEnabled(true);
     }
 
+    // 이미지를 String 형태로 인코딩한다
     private String encodeImagetoString(Bitmap scaledBitmap) {
         BitmapFactory.Options options = null;
         options = new BitmapFactory.Options();
@@ -1137,18 +1155,21 @@ public class NFCActivity extends Activity {
         return Base64.encodeToString(byte_arr, 0);
     }
 
+    // 파일 확장자 추출
     private String extractExtName(String fileName) {
         String extName = null;
         extName = Files.getFileExtension(fileName);
         return extName;
     }
 
+    // 파일 이름 공백 제거
     private String convertStrNoSpace(String productName) {
         String noSpaceStr = productName.replace(" ", "");
         return noSpaceStr;
         //replaceAll("\\s", "")
     }
 
+    // 사진 Resizing
     private int getOperandForResizeImg(Bitmap bitmap) {
         int maxHeight = 280;
         int operand = operand = bitmap.getHeight() / maxHeight;

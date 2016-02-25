@@ -64,7 +64,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/textView2"
             android:layout_marginBottom="6dp"
-            android:text="시리얼 ID"
+            android:text="시리얼 No."
             android:textColor="#000000"
             android:textSize="16dp"
             android:textStyle="bold"

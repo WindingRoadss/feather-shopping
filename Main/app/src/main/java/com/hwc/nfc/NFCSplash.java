@@ -31,12 +31,13 @@ import java.util.Locale;
 
 public class NFCSplash extends Activity {
 
+    // NFC용 객체
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
 
     // 입력할 url, aar
     private String url = "url";
-    private String aar = "aar";
+    private String aar = "com.hwc.main";
 
     // used 정보와 tagid 정보를 담을 bundle
     private Bundle bundle;
@@ -44,21 +45,23 @@ public class NFCSplash extends Activity {
     private boolean boolIsUsed;
     private boolean boolIsEmptyChip;
 
+    // 사용된 정보 가져오는 스레드
     private ThreadSelectIsUsed threadSelectIsUsed;
     private boolean checkIsUsed = false;
 
+    // Database Access Object
     private NFCDao nfcDao;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfcsplash);
+
         ImageView img_taghand = (ImageView) findViewById(R.id.img_nfcfont);
         Animation alphaAnim = AnimationUtils.loadAnimation(this, R.anim.my_blinking_drawable);
-        img_taghand.startAnimation(alphaAnim);
+        img_taghand.startAnimation(alphaAnim); // Splash 애니메이션 시작
 
-        /* NFC 연결 부분 코드 시작 지점*/
+        // NFC 태깅 지원
         nfcDao = new NFCDao();
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -105,9 +108,7 @@ public class NFCSplash extends Activity {
     // onNewIntent 메소드 수행 후 호출되는 메소드
     private void processTag(Intent intent) throws InterruptedException {
 
-        // EditText에 입력된 값이 있는지 없는지 알기 위한 변수
-        //String s_url = url.getText().toString();
-        //String s_aar = aar.getText().toString();
+        // 입력된 url과 aar
         String s_url = url;
         String s_aar = aar;
 
@@ -173,35 +174,12 @@ public class NFCSplash extends Activity {
 
                 ndef.connect(); // ndef 연결
 
-                // 쓰기가 불가능하면
-//                if (!ndef.isWritable()) {
-//                    Toast.makeText(getApplicationContext(), "Error: tag not writable",
-//                            Toast.LENGTH_SHORT).show();
-//                    return false;
-//                }
-
-                // Tag에 들어간 Ndef메시지의 크기가 허용된 최대 크기보다 크면
-//                if (ndef.getMaxSize() < size) {
-//                    Toast.makeText(getApplicationContext(),
-//                            "Error: tag too small",
-//                            Toast.LENGTH_SHORT).show();
-//                    return false;
-//                }
-
                 //NdefMessage를 얻어온 Tag에 입력
-                //ndef.writeNdefMessage(message);
-
-                //Toast.makeText(getApplicationContext(), "쓰기 성공!", Toast.LENGTH_SHORT).show();
+                ndef.writeNdefMessage(message);
 
                 byte[] tagId = tag.getId();
                 // 이 부분 주석 안하면 tag read시 에러남
                 Toast.makeText(getApplicationContext(), "사용되지 않은 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
-//                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
-                //tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-//                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
-
-
-                //threadTest(); // test 중
 
                 strTagId = byteArrayToHex(tagId);
                 boolIsUsed = false;
@@ -211,17 +189,6 @@ public class NFCSplash extends Activity {
                 startActivity(intent);
 
 //                execForUnusedTagThread();
-
-
-                // 읽기 전용 checkbox 체크시
-//                if(readOnlyIsChecked) {
-//                    ndef.makeReadOnly();
-//                }
-                // 포맷 chechbox 체크시
-//                if(formatIsChecked) {
-//                    // 감지된 태그를 포맷
-//                    FormatNFC(message,tag);
-//                }
 
                 return true;
 
@@ -233,21 +200,11 @@ public class NFCSplash extends Activity {
                 ndef.connect();
 
                 //NdefMessage를 얻어온 Tag에 입력
-                //ndef.writeNdefMessage(message);
+                ndef.writeNdefMessage(message);
 
                 byte[] tagId = tag.getId();
-                // 이 부분 주석 안하면 tag read시 에러남
-                //Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
 
                 strTagId = byteArrayToHex(tagId);
-
-                //tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
-//                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getApplicationContext(), "쓰기 성공!", Toast.LENGTH_SHORT).show();
-
-                // 최초일 때만 InsertTag
-
-                //threadTest(); // test 중
 
                 threadSelectIsUsed = new ThreadSelectIsUsed();
 
@@ -270,20 +227,7 @@ public class NFCSplash extends Activity {
                     putDataIntoBundle(intent);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    //execForUnusedTagThread();
                 }
-                //execInitThread();
-
-                // 읽기 전용 checkbox 체크시
-//                if(readOnlyIsChecked) {
-//                    ndef.makeReadOnly();
-//                }
-                // 포맷 chechbox 체크시
-//                if(formatIsChecked) {
-//                    // 감지된 태그를 포맷
-//                    FormatNFC(message,tag);
-//                }
-
                 return true;
             }
 
@@ -374,7 +318,5 @@ public class NFCSplash extends Activity {
             }
         }, 0);
     }
-
-
     /* NFC 연결 부분 코드 종료 지점*/
 }
