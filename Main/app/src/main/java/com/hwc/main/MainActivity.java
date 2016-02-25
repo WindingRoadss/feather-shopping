@@ -36,11 +36,13 @@ public class MainActivity extends Activity {
     private HashMap<String, String>[] hashMapLoginResult; //회원의 ID와 이름 저장
     private boolean mChecked = false;
     public ProgressDialog progDialog;
-    // SharedPrefence를 위한 멤버 변수
-    private LoginSession loginSession;
-    private HashMap<String, String> infoList = new HashMap<String, String>();
-    private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
 
+    // LoginSession 유지를 위한 변수
+    private LoginSession loginSession;
+    private HashMap<String, String> infoList = new HashMap<String, String>(); // 사용자 정보 리스트
+    private HashMap<String, String> infoListFormPref; // 사용자 정보 Preference에서 받아온 결과
+
+    // Database Access Object
     private LoginDao loginDao;
     private CommonDao commonDao;
 
@@ -52,22 +54,21 @@ public class MainActivity extends Activity {
         commonDao.setCurrentActivity(this);
 
         loginDao = new LoginDao();
-
         loginSession = new LoginSession(getApplicationContext());
-
         loginSession.clearPreferences(); // 자동 로그인 취소
 
         et_id = (EditText) findViewById(R.id.et_id);
         et_password = (EditText) findViewById(R.id.et_password);
 
+        // id, password 초기화
         et_id.setText("");
         et_password.setText("");
 
+        // SharedPreference에 저장된 LoginSession 정보 받아온다
         infoListFormPref = loginSession.getPreferencesResultHashMap();
 
-        if (infoListFormPref.get("id").length() != 0) { // id가 10글자를 넘어가면
+        if (infoListFormPref.get("id").length() != 0) { // 저장된 id가 있다면
             if(infoListFormPref.get("isAdmin").equals("1")) { // 관리자인 경우
-                Log.d("auto login", loginSession.getPreferencesResultHashMap().get("id"));
                 Intent intent = new Intent(getBaseContext(), SelectActivity.class);
                 startActivity(intent);
                 finish();
@@ -79,7 +80,7 @@ public class MainActivity extends Activity {
             }
         }
 
-
+        // 로그인 버튼
         bt_enter = (Button) findViewById(R.id.bt_enter);
         bt_enter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +88,6 @@ public class MainActivity extends Activity {
                 ThreadLogin t_login = new ThreadLogin();
                 if (mChecked == true) {
                     t_login.interrupt();
-                    Log.d("HWC", "스레드 죽임");
                 }
                 Dialog mProgress = new Dialog(MainActivity.this, R.style.MyDialog);
                 mProgress.setCancelable(true);
@@ -106,18 +106,9 @@ public class MainActivity extends Activity {
             }
         });
 
-        /*
-        bt_karttemp = (Button) findViewById(R.id.bt_karttemp);
-        bt_karttemp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), CartActivity.class);
-                startActivity(intent);
-            }
-        });
-  */
     }
 
+    // 로그인 기능 수행 스레드
     class ThreadLogin extends Thread {
         @Override
         public void run() {
@@ -128,25 +119,17 @@ public class MainActivity extends Activity {
             password = String.valueOf(et_password.getText());
             try {
                 hashMapLoginResult = loginDao.selectLoginUserInfo(id, password);
-                //Log.d("set ID Test", "try 전0" + arrayMemberIdName.get(0));
                 if(hashMapLoginResult != null) {
                     if (hashMapLoginResult[0].get("status") == "OK") { //login 성공
-                        //ConnectDB.setId(id);
-                        //ConnectDB.setName(arrayMemberIdName.get(1));
-                        //ConnectDB.setEmail(arrayMemberIdName.get(2));
-
-                        // SharedPreference
+                        // SharedPreference에 Data put
                         infoList.put("id", id);
                         infoList.put("isAdmin", hashMapLoginResult[0].get("admin"));
-                        //infoList.put("username", hashMapLoginResult[0].get("name"));
                         infoList.put("name", hashMapLoginResult[0].get("name"));
                         if(hashMapLoginResult[0].get("brand") != null)
                             infoList.put("brand", hashMapLoginResult[0].get("brand"));
 
                         loginSession = new LoginSession(getApplicationContext(), infoList);
                         infoListFormPref = loginSession.getPreferencesResultHashMap();
-                        Log.d("shared pref", infoListFormPref.get("id"));
-                        Log.d("shared pref",infoListFormPref.get("name"));
 
                         if (hashMapLoginResult[0].get("admin").equals("1")) { // 관리자인 경우
                             Intent intent = new Intent(getBaseContext(), SelectActivity.class);
@@ -157,14 +140,13 @@ public class MainActivity extends Activity {
                             startActivity(intent);
                             finish();
                         }
-
                         progDialog.dismiss();
-                    } else {
+                    } else { // 에러 메시지 출력
                         failedLogin(hashMapLoginResult[0].get("message"));
                         progDialog.dismiss();
                     }
                 }
-                else {
+                else { // 로그인 실패 정보 메시지 출력
                     failedLogin("로그인 정보를 다시 확인해주세요");
                     progDialog.dismiss();
                 }
@@ -177,6 +159,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    // 다이얼로그 시작
     public void progressDialog() {
         Handler mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(new Runnable() {
@@ -190,6 +173,7 @@ public class MainActivity extends Activity {
         }, 0);
     }
 
+    // 실패한 로그인인 경우 수행
     public void failedLogin(final String message) {
         Handler mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(new Runnable() {
@@ -201,6 +185,7 @@ public class MainActivity extends Activity {
         }, 0);
     }
 
+    // Progress Dialog onKeyDown 정의
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {

@@ -16,39 +16,27 @@ public class LoginDao {
 
     private CommonDao commonDao = new CommonDao();
 
+    // 로그인 쿼리 수행 함수
     public HashMap<String, String>[] selectLoginUserInfo(String userId, String password)
             throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/login/encryptLogin.php";
 
-        //getData("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/cart/cart.php")
-
-//        HttpPost request = makeHttpPost("id", id, "pwd", password,
-//                paramURL);
         ArrayList<String> tagList = new ArrayList<String>();
         ArrayList<String> valueList = new ArrayList<String>();
 
-        // 매개변수 List 데이터 삽입
+        // 매개변수 List 데이터 삽입 php에 전송할 데이터
         tagList.add("id");
         valueList.add(userId);
         tagList.add("pwd");
         valueList.add(password);
 
-        /*
-        data_name.add(c.getString(TAG_NAME));
-        data_size.add(c.getString(TAG_SIZE));
-        data_color.add(c.getString(TAG_COLOR));
-        data_brand.add(c.getString(TAG_BRAND));
-        data_image.add(c.getString(TAG_IMAGE));
-        data_price.add(c.getString(TAG_PRICE));
-        data_snum.add(c.getString(TAG_SNUM));
-        */
-
+        // 연결 및 request 수행
         HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
         HttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(request);
 
-        // resultTags는 column 이름
+        // resultTags는 column 이름 (쿼리 수행 결과 데이터)
         ArrayList<String> resultTags = new ArrayList<String>();
         resultTags.add("admin");
         resultTags.add("name");

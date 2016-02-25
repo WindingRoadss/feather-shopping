@@ -41,16 +41,9 @@ public class NFCActivity extends Activity {
 
     private int PICK_IMAGE_REQUEST = 1;
     public static final String UPLOAD_KEY = "image";
-    //ProgressDialog prgDialog;
-
-    //String strImageEncoded;
-    //RequestParams params = new RequestParams();
 
     String strImageEncoded, strSelecteProductImagPath = null, strSelecteProductImagName = null;
 
-    //EditText url;           // url 입력 받는 부분
-    //EditText aar;           // AAR 입력 받는 부분
-    /* branch test */
     private String selectedBrand = null;
     private String selectedProductName = null;
     private String selectedSerial = null;
@@ -85,7 +78,7 @@ public class NFCActivity extends Activity {
     private ThreadSelectSize threadSelectSize;
     private ThreadSelectColor threadSelectColor;
     private ThreadSelectPriceStock threadSelectPriceStock;
-    private ThreadUpdateProductInfo threadUpdateProductInfo; // no array
+    private ThreadUpdateProductInfo threadUpdateProductInfo;
     private ThreadSelectProductInfo threadSelectProductInfo;
     private ThreadSelectIsUsed threadSelectIsUsed;
     private ThreadLoadProductImage threadLoadProductImage;
@@ -378,8 +371,6 @@ public class NFCActivity extends Activity {
 
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
-        // 입력할 url, aar
-
         spinBrand.setOnItemSelectedListener(onItemSelectedListenerBrand);
         spinProductName.setOnItemSelectedListener(onItemSelectedListenerProductName);
         spinSerial.setOnItemSelectedListener(onItemSelectedListenerSerial);
@@ -410,47 +401,7 @@ public class NFCActivity extends Activity {
             }
         }
 
-        // Used인지 Unused인지 판단
-
-
-        //disableSpinner(spinBrand);
-        //disableSpinner(spinProductName);
-        //disableSpinner(spinSerial);
-        //disableSpinner(spinSize);
-        //disableSpinner(spinColor);
-
-
-//        Log.d("ked", "test1");
-
-//        if (showBrandThreadCheck == true) {
-//            threadShowBrand.interrupt();
-//        }
-
     }
-
-
-    // 포맷하는 메서드
-//    public void FormatNFC(NdefMessage message, Tag tag) {
-//
-//        NdefFormatable formatable = NdefFormatable.get(tag);
-//
-//        if (formatable != null) {
-//            try {
-//
-//                formatable.connect();
-//                formatable.formatReadOnly(message);
-//                formatable.format(message);
-//            }
-//
-//            catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
-//            catch (FormatException fe) {
-//                fe.printStackTrace();
-//            }
-//        }
-//    }
-
 
     class ThreadInsertTag extends Thread {
         @Override
@@ -502,7 +453,7 @@ public class NFCActivity extends Activity {
                 for(int i = 0; i < result.length; i++)
                     Log.d("brand list", result[i].get("brand"));
 
-                /*
+                /* 브랜드 정보 모두다 가져오는 부분
                 for(HashMap<String, String> hashMap : result) {
                     if (hashMap.get("status") == "OK") {
                         itemList.add(hashMap.get("brand")); // 브랜드 리스트
@@ -526,7 +477,6 @@ public class NFCActivity extends Activity {
                                 spinBrand.setSelection(spinPosition);
                             }
                         }
-                        //spinBrand.setSelection(null);
                     }
                 });
 
@@ -548,7 +498,6 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectProductName(selectedBrand);
 
                 ArrayList<String> itemList = null;
@@ -619,7 +568,6 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectSerial(selectedBrand, selectedProductName);
 
                 ArrayList<String> itemList = null;
@@ -684,7 +632,6 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectSize(selectedBrand, selectedSerial);
 
                 ArrayList<String> itemList = null;
@@ -747,7 +694,6 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectColor(selectedBrand, selectedSerial, selectedSize);
 
                 ArrayList<String> itemList = null;
@@ -808,11 +754,9 @@ public class NFCActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectPriceStock(selectedBrand, selectedSerial
                         , selectedSize, selectedColor);
 
-                //ArrayList<String> itemList = null;
                 String stock = null;
                 String price = null;
 
@@ -846,7 +790,6 @@ public class NFCActivity extends Activity {
         }
     }
 
-    // 사진도 같이 업로드 해야 함
     class ThreadUpdateProductInfo extends Thread {
         @Override
         public void run() {
@@ -864,23 +807,18 @@ public class NFCActivity extends Activity {
                 if(strSelecteProductImagName != null)
                     noSpacePrName = convertStrNoSpace(selectedProductName);
 
-                //printToastInThread("blank : " + noSpacePrName);
-                // printToastInThread(selectedProductName);
-                // printToastInThread(extName);
-
                 final HashMap<String, String> result = nfcDao.updateProductInfo(tagId,
                         selectedBrand, noSpacePrName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
-                //selectedBrand, selectedProductName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
                         handler.post(new Runnable() {
                             public void run() {
-                                printToastInThread("productInfo save Success" + " Message : " + result.get("message"));
+                                printToastInThread(result.get("message"));
                             }
                         });
                     } else {
-                        printToastInThread("productInfo save Fail" + " Message : " + result.get("message"));
+                        printToastInThread(result.get("message"));
                     }
                 }
             } catch (ClientProtocolException e) {
@@ -903,12 +841,9 @@ public class NFCActivity extends Activity {
 
                 final HashMap<String, String>[] result = nfcDao.selectProductInfo(tagId);
 
-                //printToastInThread("ThreadSelectProductInfo In");
-
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
-                            //setTextView(hashMap.get("tagId"), tvTagId);
                             setTextView(tagId, tvTagId);
                             selectedSerial = hashMap.get("serial");
                             selectedColor = hashMap.get("color");
@@ -918,7 +853,6 @@ public class NFCActivity extends Activity {
                             selectedProductImage = hashMap.get("image");
                             setTextView(hashMap.get("price"), tvPrice);
                             setTextView(hashMap.get("stock"), tvStock);
-                            //printToastInThread("ThreadSelectProductInfo Success");
                         } else {
                             printToastInThread("ThreadSelectProductInfo Fail");
                         }
@@ -957,8 +891,6 @@ public class NFCActivity extends Activity {
                 String tagId = strTagIdFromBundle; // tagId 가져온다
 
                 final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
-
-                //printToastInThread("ThreadSelectIsUsed In");
 
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
@@ -1022,11 +954,6 @@ public class NFCActivity extends Activity {
 
     public void execForUnusedTagThread() {
 
-        // 최초일 때만 InsertTag
-//        if (checkInsertTagThread == true) {
-//            threadInsertTag.interrupt();
-//        }
-
         // Looper.getMainLooper() : main UI 접근하기 위함
         // main UI 내의 요소를 변경하기 위한 핸들러
         Handler handler = new Handler(Looper.getMainLooper());
@@ -1052,9 +979,6 @@ public class NFCActivity extends Activity {
         if (checkSelectAllBrandThread == true) {
             threadSelectAllBrand.interrupt();
         }
-
-//        threadInsertTag = new ThreadInsertTag();
-//        threadInsertTag.start();
 
         threadSelectAllBrand = new ThreadSelectAllBrand();
         threadSelectAllBrand.start();
@@ -1102,9 +1026,6 @@ public class NFCActivity extends Activity {
         if(checkSelectProductInfo == true) {
             threadSelectProductInfo.interrupt();
         }
-
-//        threadInsertTag = new ThreadInsertTag();
-//        threadInsertTag.start();
 
         threadSelectAllBrand = new ThreadSelectAllBrand();
         threadSelectAllBrand.start();
@@ -1208,8 +1129,6 @@ public class NFCActivity extends Activity {
         BitmapFactory.Options options = null;
         options = new BitmapFactory.Options();
         options.inSampleSize = 3;
-        // bitmap = BitmapFactory.decodeFile(strSelecteProductImagPath, options);
-        // bitmap = scaledBitmap;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         // Must compress the Image to reduce image size to make upload easy
         scaledBitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
@@ -1235,189 +1154,5 @@ public class NFCActivity extends Activity {
         int operand = operand = bitmap.getHeight() / maxHeight;
         return operand;
     }
-
-    /*
-    private void setAllSelectedData(String serial, String color, String size, String productName,
-                                    String brand, String price, String stock) {
-        selectedSerial = serial;
-        selectedColor = color;
-        selectedSize = size;
-        selectedProductName = productName;
-        selectedBrand = brand;
-        tvPrice.setText(price);
-        tvStock.setText(stock);
-    }
-    */
-
-    /*
-    public String getStringImage(Bitmap bmp){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
-    }
-
-    private void uploadImage(){
-        class UploadImage extends AsyncTask<Bitmap,Void,String> {
-
-            ProgressDialog loading;
-            //RequestHandler rh = new RequestHandler();
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                loading = ProgressDialog.show(NFCActivity.this, "Uploading Image", "Please wait...",true,true);
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                loading.dismiss();
-                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            protected String doInBackground(Bitmap... params) {
-                Bitmap bitmap = params[0];
-                String uploadImage = getStringImage(bitmap);
-
-                printToastInThread(uploadImage);
-
-                HashMap<String,String> data = new HashMap<>();
-                data.put(UPLOAD_KEY, uploadImage);
-
-                // String result = commonDao.sendPostRequest(UPLOAD_URL,data);
-                // pkPath
-                // String pkPath = "/images/php/tagging/insertToPaidCart.php";
-                String result = commonDao.sendPostRequest(data);
-
-                return result;
-            }
-        }
-
-        UploadImage ui = new UploadImage();
-        ui.execute(bitmapSelectedPrImage); // 실제 thread 실행
-    }
-    */
-
-    // When Upload button is clicked
-    /*
-    public void uploadImage() {
-        // When Image is selected from Gallery
-
-        if (strSelecteProductImagPath != null && !strSelecteProductImagPath.isEmpty()) {
-            //prgDialog.setMessage("Converting Image to Binary Data");
-            //prgDialog.show();
-            // Convert image to String using Base64
-            encodeImagetoString();
-            // When Image is not selected from Gallery
-        }
-        else {
-            Toast.makeText( getApplicationContext(), "You must select image from gallery before you try to upload", Toast.LENGTH_LONG).show();
-        }
-    }
-    */
-
-    // AsyncTask - To convert Image to String
-    /*
-    private String encodeImagetoString() {
-        new AsyncTask<Void, Void, String>() {
-
-            protected void onPreExecute() {
-
-            };
-
-            @Override
-            protected String doInBackground(Void... params) {
-                BitmapFactory.Options options = null;
-                options = new BitmapFactory.Options();
-                options.inSampleSize = 3;
-                bitmap = BitmapFactory.decodeFile(strSelecteProductImagPath, options);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                // Must compress the Image to reduce image size to make upload easy
-                bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                byte[] byte_arr = stream.toByteArray();
-                // Encode Image to String
-                strImageEncoded = Base64.encodeToString(byte_arr, 0);
-                return "";
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                //prgDialog.setMessage("Calling Upload");
-                // Put converted Image string into Async Http Post param
-                params.put("image", encodedString);
-                // Trigger Image upload
-                triggerImageUpload();
-            }
-        }.execute(null, null, null);
-    }
-    */
-
-    /*
-    public void triggerImageUpload() {
-        makeHTTPCall();
-    }
-    */
-
-    /*
-    // Make Http call to upload Image to Php server
-    public void makeHTTPCall() {
-        //prgDialog.setMessage("Invoking Php");
-        AsyncHttpClient client = new AsyncHttpClient();
-        // Don't forget to change the IP address to your LAN address. Port no as well.
-        client.post("http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com/php/NFC/addImage.php",
-        params, new AsyncHttpResponseHandler() {
-            // When the response returned by REST has Http
-            // response code '200'
-            @Override
-            public void onSuccess(String response) {
-                // Hide Progress Dialog
-                //prgDialog.hide();
-                Toast.makeText(getApplicationContext(), "onSucceess In", Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-            }
-
-            // When the response returned by REST has Http
-            // response code other than '200' such as '404',
-            // '500' or '403' etc
-            @Override
-            public void onFailure(int statusCode, Throwable error,
-                                  String content) {
-                // Hide Progress Dialog
-                //prgDialog.hide();
-                // When Http response code is '404'
-                if (statusCode == 404) {
-                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
-                }
-                // When Http response code is '500'
-                else if (statusCode == 500) {
-                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-                }
-                // When Http response code other than 404, 500
-                else {
-                    Toast.makeText(getApplicationContext(),
-                            "Error Occured n Most Common Error: n1. Device not connected to Internetn2. Web App is not deployed in App servern3. App server is not runningn HTTP Status code : "
-                                    + statusCode, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-    */
-
-    /*
-    // progress bar 꺼지게 하는 곳
-    @Override
-    protected void onDestroy() {
-        // TODO Auto-generated method stub
-        super.onDestroy();
-        // Dismiss the progress bar when application is closed
-        if (prgDialog != null) {
-            //prgDialog.dismiss();
-        }
-    }
-    */
-
 
 }

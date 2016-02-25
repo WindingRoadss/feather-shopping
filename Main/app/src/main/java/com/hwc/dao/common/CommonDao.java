@@ -41,12 +41,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class CommonDao {
 
-    private String webServerURL = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com";
+    private String webServerURL = "http://ec2-52-36-28-13.us-west-2.compute.amazonaws.com"; // Web 서버 주소
     private Activity currentActivity;
-
-    /**********  File Path *************/
-    final String uploadFilePath = "storage/emulated/0/";//경로를 모르겠으면, 갤러리 어플리케이션 가서 메뉴->상세 정보
-    final String uploadFileName = "testimage.jpg"; //전송하고자하는 파일 이름
 
     public String getWebServerURL() {
         return webServerURL;
@@ -60,7 +56,7 @@ public class CommonDao {
         this.webServerURL = webServerURL;
     }
 
-    //make entity
+    // make entity
     public HttpEntity makeEntity(Vector<NameValuePair> nameValue) {
         HttpEntity result = null;
         try {
@@ -72,6 +68,8 @@ public class CommonDao {
         return result;
     }
 
+
+    // HttpPost 결과 반환
     public HttpPost makeHttpPost(ArrayList<String> tagList,
                                          ArrayList<String> valueList, String url) {
         // TODO Auto-generated method stub
@@ -86,17 +84,16 @@ public class CommonDao {
                 nameValue.add(new BasicNameValuePair(tagList.get(i), valueList.get(i)));
             }
         }
-//        nameValue.add(new BasicNameValuePair(t1, v1));
-//        nameValue.add(new BasicNameValuePair(t2, v2));
+
         request.setEntity(makeEntity(nameValue));
         return request;
     }
 
-    //json parsing : 하나의 레코드만 반환받는다
+    //json parsing : 하나의 레코드만 HashMap으로 반환받는다
     public HashMap<String, String> getResultNoArray(HttpResponse response, ArrayList<String> tags) //results가 여러개 넘어오기 때문에
             throws IllegalStateException, IOException {
 
-        HashMap<String, String> result = null; //= new HashMap<String, String>()[];
+        HashMap<String, String> result = null;
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
 
         StringBuffer sb = new StringBuffer();
@@ -109,12 +106,11 @@ public class CommonDao {
         try {
             o = new JSONObject(sb.toString());
             String numResults = o.getString("num_results");
-            // if(!numResults.equals("0"))
             result = new HashMap<String, String>();
 
             result.put("message", o.getString("message")); // 메시지 저장
 
-            if (o.getString("status").equals("OK")) {
+            if (o.getString("status").equals("OK")) { // 정상적으로 반환 받았으면
                 result.put("status", "OK");
                 JSONArray ja = o.getJSONArray("results");
                 if(!numResults.equals("0")) {
@@ -131,7 +127,7 @@ public class CommonDao {
             else if (o.getString("status").equals("FIN")) {
                 result.put("status", "FIN");
             }
-            else {
+            else { // 제대로 반환 받지 못했으면
                 result.put("status", "NO");
                 Log.d("CommonDAO", "CommonDAO getresult list NO");
             }
@@ -143,11 +139,11 @@ public class CommonDao {
     }
 
 
-    //json parsing
+    //json parsing : 여러개의 레코드를 HashMap 배열로 반환받는다
     public HashMap<String, String>[] getResult(HttpResponse response, ArrayList<String> tags) //results가 여러개 넘어오기 때문에
             throws IllegalStateException, IOException {
 
-        HashMap<String, String> result[] = null; //= new HashMap<String, String>()[];
+        HashMap<String, String> result[] = null;
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
 
         StringBuffer sb = new StringBuffer();
@@ -164,13 +160,13 @@ public class CommonDao {
             if(numResults.equals("0"))
                 return null;
              else {
-                result = new HashMap[Integer.valueOf(numResults)];
+                result = new HashMap[Integer.valueOf(numResults)]; // 개수만큼 할당
             }
             for(int hashIndex = 0; hashIndex < result.length; hashIndex++) {
-                result[hashIndex] = new HashMap<String, String>(); // 객체 생성
+                result[hashIndex] = new HashMap<String, String>(); // 실제 객체 생성
                 if(!numResults.equals("0"))
                     result[0].put("resultNum", numResults);
-                if (o.getString("status").equals("OK")) {
+                if (o.getString("status").equals("OK")) { // 정상적으로 반환 받았으면
                     result[hashIndex].put("status", "OK");
                     JSONArray ja = o.getJSONArray("results");
                     for (String tag : tags) {
@@ -183,7 +179,7 @@ public class CommonDao {
                 else if (o.getString("status").equals("FIN")) {
                     result[hashIndex].put("status", "FIN");
                 }
-                else {
+                else { // 제대로 반환 받지 못했으면
                     Log.d("CommonDao", "hashIndex : " + Integer.toString(hashIndex));
                     result[hashIndex].put("status", "NO");
                     Log.d("CommonDAO", "CommonDAO getresult list NO");
@@ -196,6 +192,7 @@ public class CommonDao {
         return result;
     }
 
+    // 비트맵 이미지 load 한다
     public Bitmap loadBitmap( String $imagePath ) {
         // TODO Auto-generated method stub
         if($imagePath != null) {
@@ -207,13 +204,12 @@ public class CommonDao {
             return null;
     }
 
+    // 비트맵 이미지를 받아오기 위한 HttpUrlConnection
     public InputStream openHttpConnection(String $imagePath) {
         // TODO Auto-generated method stub
         InputStream stream = null ;
         try {
-            Log.d("url encode", $imagePath);
-            //Log.d("url encode", URLEncoder.encode($imagePath, "utf-8"));
-            //URL url = new URL(URLEncoder.encode($imagePath, "utf-8"));
+            //Log.d("url encode", $imagePath);
             URL url = new URL($imagePath);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection() ;
             urlConnection.setRequestMethod( "GET" ) ;
@@ -231,6 +227,7 @@ public class CommonDao {
         return stream ;
     }
 
+    // 네트워크 연결 상태를 확인하기 위한 함수
     public boolean isNetworkAvailable() {
         ConnectivityManager connec = (ConnectivityManager) currentActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobileInfo = connec.getNetworkInfo(0);

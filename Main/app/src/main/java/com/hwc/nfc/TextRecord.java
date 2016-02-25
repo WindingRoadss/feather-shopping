@@ -1,7 +1,5 @@
 package com.hwc.nfc;
 
-/* Do it! 안드로이드 앱 프로그래밍 Part2 Chapter12 SampleNFC 코드 참조 */
-
 import android.annotation.SuppressLint;
 import android.nfc.NdefRecord;
 

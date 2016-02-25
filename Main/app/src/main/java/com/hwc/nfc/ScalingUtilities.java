@@ -7,9 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-/**
- * Created by K on 2016-02-19.
- */
 public class ScalingUtilities {
 
     /**

@@ -29,11 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * URL url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
- * Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
- * img_test.setImageBitmap(bmp);
- */
 
 public class PaidActivity extends Activity {
     public PaidListView_custom adapter;

@@ -7,9 +7,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by K on 2016-02-19.
- */
 public class SharedCommon {
 
     public void putPreferences(Context context, String prefName, HashMap<String, String> hashMap, ArrayList<String> keyList)

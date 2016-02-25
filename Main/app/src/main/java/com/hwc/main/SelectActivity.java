@@ -20,6 +20,7 @@ import com.hwc.tagging.TaggingSplash;
 import java.util.HashMap;
 
 public class SelectActivity extends Activity {
+
     public static ProgressDialog progDialog;
     private TextView tvUserName;
     private Button btnLogout;
@@ -31,9 +32,9 @@ public class SelectActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select);
 
+        // LoginSession 정보 가져온다
         loginSession = new LoginSession(getApplicationContext());
         HashMap<String, String> infoListFormPref = loginSession.getPreferencesResultHashMap();
-
         String userName = infoListFormPref.get("name");
 
         tvUserName = (TextView) findViewById(R.id.tvUserName);
@@ -41,17 +42,18 @@ public class SelectActivity extends Activity {
 
         tvUserName.setText(userName);
 
+        // Activity 전환 버튼
         Button btnNFCInfo = (Button) findViewById(R.id.btnNFCInfo);
         btnNFCInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 Intent intent = new Intent(SelectActivity.this, NFCSplash.class);
-                //Intent intent = new Intent(SelectActivity.this, NFCActivity.class);
                 startActivity(intent);
             }
         });
 
+        // Activity 전환 버튼
         Button btnTaggingProduct = (Button) findViewById(R.id.btnTagging);
         btnTaggingProduct.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +64,7 @@ public class SelectActivity extends Activity {
             }
         });
 
+        // Activity 전환 버튼
         Button btnCartInfo = (Button) findViewById(R.id.btnCart);
         btnCartInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +78,7 @@ public class SelectActivity extends Activity {
             }
         });
 
-
+        // Activity 전환 버튼
         Button btnPaying = (Button) findViewById(R.id.btnPaid);
         btnPaying.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,12 +92,10 @@ public class SelectActivity extends Activity {
             }
         });
 
+        // 로그아웃 버튼
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //progDialog = new ProgressDialog(SelectActivity.this);
-                //progDialog.setMessage("로그아웃 중입니다......");
-                //progDialog.show();
                 AlertDialog.Builder alertDlg = new AlertDialog.Builder(SelectActivity.this);
                 alertDlg.setIcon(R.mipmap.ic_launcher);
                 alertDlg.setMessage("로그아웃 하시겠습니까?");
@@ -111,7 +112,7 @@ public class SelectActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int whichButton) {
-                                loginSession.clearPreferences();
+                                loginSession.clearPreferences(); // 저장된 정보 삭제
                                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                                 startActivity(intent);
                                 finish();
@@ -124,6 +125,7 @@ public class SelectActivity extends Activity {
         });
     }
 
+    // Progress Dialog onKeyDown 정의
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {

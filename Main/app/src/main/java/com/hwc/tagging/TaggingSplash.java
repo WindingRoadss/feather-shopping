@@ -67,10 +67,6 @@ public class TaggingSplash extends Activity {
                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        // 받는 부분
-        // bundle = getIntent().getExtras();
-        // pet_name = bundle.getString("pet_name");
         /* NFC 연결 부분 코드 종료 지점*/
     }
 
@@ -109,6 +105,7 @@ public class TaggingSplash extends Activity {
         Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         // 감지된 태그 Read
         readTag(detectedTag);
+
     }
 
     // 감지된 태그에 NdefMessage를 쓰는 메소드
@@ -125,7 +122,6 @@ public class TaggingSplash extends Activity {
 
                 byte[] tagId = tag.getId();
 
-                //tvTagId.setText("포맷이 필요합니다" + byteArrayToHex(tagId)); // tvTagId 세팅
                 strTagId = byteArrayToHex(tagId);
                 Toast.makeText(getApplicationContext(), "포맷이 필요합니다", Toast.LENGTH_SHORT).show();
 
@@ -140,11 +136,7 @@ public class TaggingSplash extends Activity {
 
                 byte[] tagId = tag.getId();
 
-                //Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
-
-                //tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
                 strTagId = byteArrayToHex(tagId); // tvTagId 세팅
-                //Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
 
                 threadSelectIsUsed = new ThreadSelectIsUsed();
 
@@ -153,24 +145,6 @@ public class TaggingSplash extends Activity {
 
                 putDataIntoBundle(intent);
                 startActivity(intent);
-
-                //if(boolIsUsed == true) { // used가 1이면
-                    //Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
-                    //tvRequestCount.setText("1");
-                    //execSelectProductInfoThread();
-                //}
-                //else { // used가 0이면
-                    //Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
-                    //execSelectProductInfoThread();
-                    //ivSelectedPrImage.setImageResource(android.R.color.transparent);
-                    // 상품 정보 보여준 것 초기화
-                    //tvRequestCount.setText("1");
-                    //tvBrand.setText("");
-                    //tvProductName.setText("");
-                    //tvSerial.setText("");
-                //}
-
-                //execSelectProductInfoThread();
 
                 return true;
             }
@@ -216,8 +190,6 @@ public class TaggingSplash extends Activity {
 
                 final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
 
-                //printToastInThread("ThreadSelectIsUsed In");
-
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
@@ -249,7 +221,6 @@ public class TaggingSplash extends Activity {
             }
         }, 0);
     }
-
-
     /* NFC 연결 부분 코드 종료 지점*/
+
 }

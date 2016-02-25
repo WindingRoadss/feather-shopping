@@ -38,10 +38,6 @@ public class TaggingActivity extends Activity {
     private HashMap<String, String> infoList = new HashMap<String, String>();
     private HashMap<String, String> infoListFormPref; //= new HashMap<String, String>();
 
-    //EditText url;           // url 입력 받는 부분
-    //EditText aar;           // AAR 입력 받는 부분
-    /* branch test */
-
     private String selectedBrand;
     private String selectedProductName;
     private String selectedSerial;
@@ -58,7 +54,6 @@ public class TaggingActivity extends Activity {
     private TextView tvTagId, tvTestResult, tvPrice, tvStock;
     private TextView tvBrand, tvProductName, tvSerial; //tvSize, tvColor;
     private Spinner spinSize, spinColor;
-    //private EditText edtRequestCount;
     private TextView tvRequestCount;
     private ImageView ivSelectedPrImage;
 
@@ -92,36 +87,6 @@ public class TaggingActivity extends Activity {
     private boolean boolIsUsedFromBundle;
     private boolean boolIsEmptyFromBundle;
     private Bundle bundle;
-
-//    private TextWatcher twTotalPriceCalculator;
-//
-//    private void twTotalPriceCalculatorGenerator() {
-//        twTotalPriceCalculator = new TextWatcher() {
-//            public void afterTextChanged(Editable editableObj) {
-//                String inputText = edtRequestCount.getText().toString();
-//                if (inputText.equals("")) { // editText가 비어있으면
-//                    edtRequestCount.setText("개수를 입력하세요");
-//                }
-//                else {
-//                    // 장바구니에 담을 상품 개수
-//                    int productCount = Integer.parseInt(edtRequestCount.getText().toString());
-//                    if(productCount > 0 && productCount <= 50) { // 가격 계산
-//                        tvPrice.setText(Integer.toString(productCount * Integer.parseInt(tvPrice.getText().toString())));
-//                    }
-//                    else
-//                        edtRequestCount.setText("올바른 개수를 입력하세요");
-//                }
-//
-//            }
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                //Do something or nothing.
-//            }
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                //Do something or nothing
-//            }
-//        };
-//
-//    }
 
     View.OnClickListener onClickListenerCart = new View.OnClickListener(){
         public void onClick(View v) {
@@ -265,18 +230,13 @@ public class TaggingActivity extends Activity {
         infoListFormPref = loginSession.getPreferencesResultHashMap();
         userId = infoListFormPref.get("id");
 
-        //tvTagId = (TextView) findViewById(R.id.tvTagId);
-        //tvTestResult = (TextView) findViewById(R.id.tvTestResult);
         tvBrand = (TextView) findViewById(R.id.tvResultBrand);
         tvProductName = (TextView) findViewById(R.id.tvResultProductName);
         tvSerial = (TextView) findViewById(R.id.tvResultSerial);
         spinColor = (Spinner) findViewById(R.id.spinColor);
         spinSize = (Spinner) findViewById(R.id.spinSize);
-        //tvSize = (TextView) findViewById(R.id.tvResultSize);
-        //tvColor = (TextView) findViewById(R.id.tvResultColor);
         tvPrice = (TextView) findViewById(R.id.tvResultPrice);
         tvStock = (TextView) findViewById(R.id.tvResultStock);
-        //edtRequestCount = (EditText) findViewById(R.id.edtRequestCount);
         tvRequestCount = (TextView) findViewById(R.id.tvRequestCount);
         btnPaying = (Button)findViewById(R.id.btnPaying);
         btnCart = (Button)findViewById(R.id.btnCart);
@@ -294,14 +254,10 @@ public class TaggingActivity extends Activity {
 
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage);
 
-        //tvTagId.setText(strTagIdFromBundle);
         boolIsUsed = boolIsUsedFromBundle;
 
-//        twTotalPriceCalculatorGenerator();
-//        edtRequestCount.addTextChangedListener(twTotalPriceCalculator);
 
         if(boolIsUsed == true) { // used가 1이면
-            //Toast.makeText(getApplicationContext(), "사용된 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
             tvRequestCount.setText("1");
             try {
                 execSelectProductInfoThread();
@@ -310,7 +266,6 @@ public class TaggingActivity extends Activity {
             }
         }
         else { // used가 0이면
-            //Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
             try {
                 execSelectProductInfoThread();
             } catch (InterruptedException e) {
@@ -325,28 +280,6 @@ public class TaggingActivity extends Activity {
         }
 
     }
-
-    // 포맷하는 메서드
-//    public void FormatNFC(NdefMessage message, Tag tag) {
-//
-//        NdefFormatable formatable = NdefFormatable.get(tag);
-//
-//        if (formatable != null) {
-//            try {
-//
-//                formatable.connect();
-//                formatable.formatReadOnly(message);
-//                formatable.format(message);
-//            }
-//
-//            catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
-//            catch (FormatException fe) {
-//                fe.printStackTrace();
-//            }
-//        }
-//    }
 
     class ThreadSelectProductInfo extends Thread {
         @Override
@@ -391,7 +324,6 @@ public class TaggingActivity extends Activity {
                             selectedSize = "";
                             selectedProductName = "";
                             selectedBrand = "";
-                            //deleteItemsInSpin(spinColor); // Item delete
                             tvPrice.setText(null);
                             tvStock.setText(null);
                         }
@@ -406,7 +338,6 @@ public class TaggingActivity extends Activity {
         }
     }
 
-    //checkInsertProductIntoCart
     class ThreadInsertProductIntoCart extends Thread {
         @Override
         public void run() {
@@ -415,7 +346,6 @@ public class TaggingActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                //selectedCount = edtRequestCount.getText().toString(); // 장바구니에 넣을 개수
                 selectedCount = tvRequestCount.getText().toString(); // 장바구니에 넣을 개수
 
                 Log.d("cart insert", "userId : " + userId);
@@ -426,8 +356,6 @@ public class TaggingActivity extends Activity {
 
                 final HashMap<String, String> result = taggingDao.insertProductIntoCart(userId,
                         selectedCount, selectedSerial, selectedSize, selectedColor);
-
-                // printToastInThread("ThreadInsertProductIntoCart In");
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
@@ -444,7 +372,6 @@ public class TaggingActivity extends Activity {
                             selectedSize = "";
                             selectedProductName = "";
                             selectedBrand = "";
-                            //deleteItemsInSpin(spinColor); // Item delete
                             tvPrice.setText(null);
                             tvStock.setText(null);
                         }
@@ -457,7 +384,6 @@ public class TaggingActivity extends Activity {
         }
     }
 
-    //checkInsertProductIntoCart
     class ThreadInsertProductPaying extends Thread {
         @Override
         public void run() {
@@ -569,12 +495,10 @@ public class TaggingActivity extends Activity {
         @Override
         public void run() {
             try {
-
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectColor(selectedBrand, selectedSerial, selectedSize);
 
                 ArrayList<String> itemList = null;
@@ -634,11 +558,9 @@ public class TaggingActivity extends Activity {
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                // test : GAP
                 HashMap<String, String>[] result = nfcDao.selectPriceStock(selectedBrand, selectedSerial
                         , selectedSize, selectedColor);
 
-                //ArrayList<String> itemList = null;
                 String stock = null;
                 String price = null;
 
@@ -683,12 +605,9 @@ public class TaggingActivity extends Activity {
 
                 final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
 
-                //printToastInThread("ThreadSelectIsUsed In");
-
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
-                            //printToastInThread("ThreadSelectIsUsed Success");
                             if(hashMap.get("used").equals("1"))
                                 boolIsUsed = true;
                             else
@@ -800,20 +719,6 @@ public class TaggingActivity extends Activity {
     private void enableSpinner(Spinner spinner) {
         spinner.setEnabled(true);
     }
-
-    /*
-    private void setAllSelectedData(String serial, String color, String size, String productName,
-                                    String brand, String price, String stock) {
-        selectedSerial = serial;
-        selectedColor = color;
-        selectedSize = size;
-        selectedProductName = productName;
-        selectedBrand = brand;
-        tvPrice.setText(price);
-        tvStock.setText(stock);
-    }
-    */
-
 
 }
 

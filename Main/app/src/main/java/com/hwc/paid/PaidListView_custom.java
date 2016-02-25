@@ -21,10 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-/**
- * Created by hyunwoo794 on 2016-01-18.
- */
-
 public class PaidListView_custom extends BaseAdapter {
     private PaidListView_custom mCustomAdapter = null;
     // Activity에서 가져온 객체정보를 저장할 변수

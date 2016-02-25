@@ -5,9 +5,6 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by K on 2016-02-19.
- */
 public class LoginSession {
 
     private SharedCommon sharedCommon;

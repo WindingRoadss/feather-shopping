@@ -29,17 +29,6 @@ public class SelectActivity_customer extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_customer);
-/*
-        Button btnNFCInfo = (Button) findViewById(R.id.btnNFCInfo);
-        btnNFCInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Intent intent = new Intent(SelectActivity_customer.this, NFCSplash.class);
-                //Intent intent = new Intent(SelectActivity.this, NFCActivity.class);
-                startActivity(intent);
-            }
-        });*/
 
         loginSession = new LoginSession(getApplicationContext());
         HashMap<String, String> infoListFormPref = loginSession.getPreferencesResultHashMap();

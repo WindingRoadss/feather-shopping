@@ -1,8 +1,5 @@
 package com.hwc.paid;
 
-/**
- * Created by hyunwoo794 on 2016-01-27.
- */
 public class PaidListView_getset {
     private String name;
     private String size;
