@@ -1,20 +1,11 @@
 package com.hwc.nfc;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,7 +13,6 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -31,25 +21,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.common.primitives.Bytes;
 import com.hwc.dao.common.CommonDao;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.main.R;
 import com.hwc.shared.LoginSession;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.apache.http.client.ClientProtocolException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class NFCActivity extends Activity {
 
@@ -74,10 +57,10 @@ public class NFCActivity extends Activity {
     private String selectedSize = null;
     private String selectedColor = null;
     private String selectedProductImage = null;
-
-    private TextView tvTagId, tvTestResult, tvPrice, tvStock;
+    private TextView tvTagId;
+    private TextView tvTestResult, tvPrice, tvStock;
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
-    private Button btnSave, btnShowSelectedPrImage, btnUploadSelectedPrImage;
+    private Button btnSave;
     private ImageView ivSelectedPrImage;
     private Bitmap bitmapSelectedPrImage;
 
@@ -339,7 +322,7 @@ public class NFCActivity extends Activity {
             strSelecteProductImagPath = cursor.getString(columnIndex);
             cursor.close();
 
-             ImageView imgView = (ImageView) findViewById(R.id.ivSelectedPrImage);
+            ImageView imgView = (ImageView) findViewById(R.id.ivSelectedPrImage);
             // imgView.setImageBitmap(BitmapFactory.decodeFile(strSelecteProductImagPath));
 
             Bitmap unscaledBitmap = BitmapFactory.decodeFile(strSelecteProductImagPath);
@@ -381,9 +364,7 @@ public class NFCActivity extends Activity {
         commonDao.setCurrentActivity(this);
 
         nfcDao = new NFCDao(); // DB 접근 객체 생성
-
-        tvTagId = (TextView) findViewById(R.id.tvTagId);
-        tvTestResult = (TextView) findViewById(R.id.tvTestResult);
+tvTagId = (TextView) findViewById(R.id.tvTagId);
         spinBrand = (Spinner) findViewById(R.id.spinBrand);
         spinProductName = (Spinner) findViewById(R.id.spinProductName);
         spinSerial = (Spinner) findViewById(R.id.spinSerial);
@@ -392,8 +373,6 @@ public class NFCActivity extends Activity {
         tvPrice = (TextView) findViewById(R.id.tvPrice);
         tvStock = (TextView) findViewById(R.id.tvStock);
         btnSave = (Button)findViewById(R.id.btnSave);
-        btnShowSelectedPrImage = (Button) findViewById(R.id.btnShowSelectedPrImage);
-        btnUploadSelectedPrImage = (Button) findViewById(R.id.btnUploadSelectedPrImage);
 
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
@@ -406,11 +385,8 @@ public class NFCActivity extends Activity {
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
 
         btnSave.setOnClickListener(onClickListenerSave);
-        btnShowSelectedPrImage.setOnClickListener(onClickListenerShowPrImage);
-        btnUploadSelectedPrImage.setOnClickListener(onClickListenerUploadPrImage);
 
         // Bundle로 넘겨받은 값 Set
-        tvTagId.setText(strTagIdFromBundle);
         boolIsUsed = boolIsUsedFromBundle;
 
         loginSession = new LoginSession(getApplicationContext());
@@ -480,7 +456,7 @@ public class NFCActivity extends Activity {
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
-                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+                String tagId = strTagIdFromBundle; // tagId 가져온다
 
                 final HashMap<String, String> result = nfcDao.insertTag(tagId);
 
@@ -876,7 +852,7 @@ public class NFCActivity extends Activity {
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
-                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+                String tagId = strTagIdFromBundle; // tagId 가져온다
                 String extName = null, noSpacePrName = null;
 
 
@@ -891,13 +867,13 @@ public class NFCActivity extends Activity {
 
                 final HashMap<String, String> result = nfcDao.updateProductInfo(tagId,
                         selectedBrand, noSpacePrName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
-                        //selectedBrand, selectedProductName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
+                //selectedBrand, selectedProductName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
                         handler.post(new Runnable() {
                             public void run() {
-                            printToastInThread("productInfo save Success" + " Message : " + result.get("message"));
+                                printToastInThread("productInfo save Success" + " Message : " + result.get("message"));
                             }
                         });
                     } else {
@@ -920,7 +896,7 @@ public class NFCActivity extends Activity {
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
-                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+                String tagId = strTagIdFromBundle; // tagId 가져온다
 
                 final HashMap<String, String>[] result = nfcDao.selectProductInfo(tagId);
 
@@ -929,6 +905,8 @@ public class NFCActivity extends Activity {
                 if(result != null) {
                     for (HashMap<String, String> hashMap : result) {
                         if (hashMap.get("status") == "OK") {
+                            //setTextView(hashMap.get("tagId"), tvTagId);
+                            setTextView(tagId, tvTagId);
                             selectedSerial = hashMap.get("serial");
                             selectedColor = hashMap.get("color");
                             selectedSize = hashMap.get("size");
@@ -973,7 +951,7 @@ public class NFCActivity extends Activity {
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
-                String tagId = tvTagId.getText().toString(); // tagId 가져온다
+                String tagId = strTagIdFromBundle; // tagId 가져온다
 
                 final HashMap<String, String>[] result = nfcDao.selectIsUsed(tagId);
 
@@ -1209,7 +1187,7 @@ public class NFCActivity extends Activity {
         itemList.add("");
         itemList.add(selectedItem);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(NFCActivity.this,
-                    android.R.layout.simple_spinner_item, itemList);
+                android.R.layout.simple_spinner_item, itemList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
