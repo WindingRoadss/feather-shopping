@@ -230,6 +230,7 @@
             android:textSize="16dp"
             android:typeface="sans" />
 
+
     </RelativeLayout>
 
 
@@ -246,5 +247,14 @@
         android:textSize="20dp"
         android:textStyle="bold"
         android:typeface="sans" />
+
+    <Button
+        android:id="@+id/btnShowSelectedPrImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/btnSave"
+        android:text="이미지 불러오기"
+        android:textSize="22dp"
+        android:textStyle="bold" />
 
 </RelativeLayout>

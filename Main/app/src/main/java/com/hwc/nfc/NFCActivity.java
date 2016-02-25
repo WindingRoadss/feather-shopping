@@ -60,7 +60,7 @@ public class NFCActivity extends Activity {
     private TextView tvTagId;
     private TextView tvTestResult, tvPrice, tvStock;
     private Spinner spinBrand, spinProductName, spinSerial, spinSize, spinColor;
-    private Button btnSave;
+    private Button btnSave, btnShowSelectedPrImage;
     private ImageView ivSelectedPrImage;
     private Bitmap bitmapSelectedPrImage;
 
@@ -364,7 +364,7 @@ public class NFCActivity extends Activity {
         commonDao.setCurrentActivity(this);
 
         nfcDao = new NFCDao(); // DB 접근 객체 생성
-tvTagId = (TextView) findViewById(R.id.tvTagId);
+        tvTagId = (TextView) findViewById(R.id.tvTagId);
         spinBrand = (Spinner) findViewById(R.id.spinBrand);
         spinProductName = (Spinner) findViewById(R.id.spinProductName);
         spinSerial = (Spinner) findViewById(R.id.spinSerial);
@@ -373,6 +373,8 @@ tvTagId = (TextView) findViewById(R.id.tvTagId);
         tvPrice = (TextView) findViewById(R.id.tvPrice);
         tvStock = (TextView) findViewById(R.id.tvStock);
         btnSave = (Button)findViewById(R.id.btnSave);
+        btnShowSelectedPrImage = (Button)findViewById(R.id.btnShowSelectedPrImage);
+
 
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
@@ -385,6 +387,7 @@ tvTagId = (TextView) findViewById(R.id.tvTagId);
         spinColor.setOnItemSelectedListener(onItemSelectedListenerColor);
 
         btnSave.setOnClickListener(onClickListenerSave);
+        btnShowSelectedPrImage.setOnClickListener(onClickListenerShowPrImage);
 
         // Bundle로 넘겨받은 값 Set
         boolIsUsed = boolIsUsedFromBundle;
@@ -1228,7 +1231,7 @@ tvTagId = (TextView) findViewById(R.id.tvTagId);
     }
 
     private int getOperandForResizeImg(Bitmap bitmap) {
-        int maxHeight = 100;
+        int maxHeight = 280;
         int operand = operand = bitmap.getHeight() / maxHeight;
         return operand;
     }
