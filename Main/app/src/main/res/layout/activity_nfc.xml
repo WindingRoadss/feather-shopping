@@ -8,6 +8,23 @@
     tools:context="com.hwc.main.MainActivity">
 
     <RelativeLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="271dp">
+
+        <Button
+            android:id="@+id/btnShowSelectedPrImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_selector"
+            android:textColor="#ffffff"
+            android:text="+"
+            android:textSize="22dp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="140dp"
         android:layout_height="140dp"
         android:layout_alignParentTop="true"
@@ -247,14 +264,5 @@
         android:textSize="20dp"
         android:textStyle="bold"
         android:typeface="sans" />
-
-    <Button
-        android:id="@+id/btnShowSelectedPrImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/btnSave"
-        android:text="이미지 불러오기"
-        android:textSize="22dp"
-        android:textStyle="bold" />
 
 </RelativeLayout>

@@ -264,7 +264,7 @@ public class NFCActivity extends Activity {
         public void onClick(View v) {
 
             if (commonDao.isNetworkAvailable()) {
-                Toast.makeText(getBaseContext(), "갤러리로 연결합니다", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "갤러리로 연결합니다.", Toast.LENGTH_SHORT).show();
                 //int PICK_IMAGE_REQUEST = 1;
                 Intent intent = new Intent();
                 intent.setType("image/*");
