@@ -64,7 +64,7 @@ public class CartDao {
     }
 
     public HashMap<String, String> insertProductPaying(String serial
-            , String size, String color, String userId) throws ClientProtocolException, IOException {
+            , String size, String color, String userId, String prcnt) throws ClientProtocolException, IOException {
         // TODO Auto-generated method stub
         String paramURL = commonDao.getWebServerURL() + "/php/cart/insertToPaidCartFromCart.php";
 
@@ -81,6 +81,8 @@ public class CartDao {
         valueList.add(color);
         tagList.add("usid");
         valueList.add(userId);
+        tagList.add("prcnt");
+        valueList.add(prcnt);
 
         HttpPost request = commonDao.makeHttpPost(tagList, valueList, paramURL);
         HttpClient client = new DefaultHttpClient();

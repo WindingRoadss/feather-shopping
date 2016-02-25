@@ -123,7 +123,7 @@ public class PaidListView_custom extends BaseAdapter {
             txt_brand.setText(lv_gst.getBrand());
             txt_price.setText(lv_gst.getPrice());
             txt_brdel.setText(lv_gst.getBrdel());
-            txt_brdel.setText(lv_gst.getPrcnt());
+            txt_prcnt.setText(lv_gst.getPrcnt());
 
             imageThread it = new imageThread();
             it.start();

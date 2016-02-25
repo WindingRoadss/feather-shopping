@@ -1,12 +1,7 @@
 package com.hwc.tagging;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -270,8 +265,8 @@ public class TaggingActivity extends Activity {
         infoListFormPref = loginSession.getPreferencesResultHashMap();
         userId = infoListFormPref.get("id");
 
-        tvTagId = (TextView) findViewById(R.id.tvTagId);
-        tvTestResult = (TextView) findViewById(R.id.tvTestResult);
+        //tvTagId = (TextView) findViewById(R.id.tvTagId);
+        //tvTestResult = (TextView) findViewById(R.id.tvTestResult);
         tvBrand = (TextView) findViewById(R.id.tvResultBrand);
         tvProductName = (TextView) findViewById(R.id.tvResultProductName);
         tvSerial = (TextView) findViewById(R.id.tvResultSerial);
@@ -299,14 +294,14 @@ public class TaggingActivity extends Activity {
 
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage);
 
-        tvTagId.setText(strTagIdFromBundle);
+        //tvTagId.setText(strTagIdFromBundle);
         boolIsUsed = boolIsUsedFromBundle;
 
 //        twTotalPriceCalculatorGenerator();
 //        edtRequestCount.addTextChangedListener(twTotalPriceCalculator);
 
         if(boolIsUsed == true) { // used가 1이면
-            Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "사용된 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
             tvRequestCount.setText("1");
             try {
                 execSelectProductInfoThread();
@@ -315,7 +310,7 @@ public class TaggingActivity extends Activity {
             }
         }
         else { // used가 0이면
-            Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
             try {
                 execSelectProductInfoThread();
             } catch (InterruptedException e) {
@@ -360,8 +355,7 @@ public class TaggingActivity extends Activity {
                 // Looper.getMainLooper() : main UI 접근하기 위함
                 // main UI 내의 요소를 변경하기 위한 핸들러
                 Handler handler = new Handler(Looper.getMainLooper());
-                String tagId = tvTagId.getText().toString(); // tagId 가져온다
-
+                String tagId = strTagIdFromBundle;
                 final HashMap<String, String>[] result = taggingDao.selectProductInfo(tagId);
 
                 // printToastInThread("ThreadSelectProductInfo In");
@@ -383,9 +377,9 @@ public class TaggingActivity extends Activity {
                             setTextView(hashMap.get("price"), tvPrice);
                             setTextView(hashMap.get("stock"), tvStock);
 
-                            printToastInThread("ThreadSelectProductInfo Success");
+                            printToastInThread("상품을 불러옵니다...");
                         } else {
-                            printToastInThread("ThreadSelectProductInfo Fail");
+                            printToastInThread("상품을 불러오지 못했습니다. 다시 한 번 시도해주세요.");
                         }
                     }
                 }
@@ -437,9 +431,9 @@ public class TaggingActivity extends Activity {
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
-                        printToastInThread("ThreadInsertProductIntoCart Success" + " Message : " + result.get("message"));
+                        printToastInThread("정상적으로 처리되었습니다.");
                     } else {
-                        printToastInThread("ThreadInsertProductIntoCart Fail" + " Message : " + result.get("message"));
+                        printToastInThread("다시 시도하여 주십시오.");
                     }
                 }
                 else {
@@ -482,9 +476,9 @@ public class TaggingActivity extends Activity {
 
                 if(result != null) {
                     if (result.get("status") == "OK") {
-                        printToastInThread("ThreadInsertProductPaying Success" + " Message : " + result.get("message"));
+                        printToastInThread("성공적으로 결제가 완료되었습니다.");
                     } else {
-                        printToastInThread("ThreadInsertProductPaying Fail" + " Message : " + result.get("message"));
+                        printToastInThread("결제에 실패하였습니다. 다시 시도해주세요.");
                     }
                 }
                 else {

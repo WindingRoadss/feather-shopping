@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.hwc.dao.cart.CartDao;
 import com.hwc.main.R;
 import com.hwc.main.SelectActivity;
+import com.hwc.main.SelectActivity_customer;
 import com.hwc.paid.PaidActivity;
 import com.hwc.shared.LoginSession;
 
@@ -40,6 +41,7 @@ import java.util.HashMap;
 public class CartActivity extends Activity {
     public ListView_custom adapter;
     public SelectActivity sa = new SelectActivity();
+    public SelectActivity_customer sa2 = new SelectActivity_customer();
     public String myJSON;
 
     public static final String HWC = "HWC";
@@ -126,12 +128,35 @@ public class CartActivity extends Activity {
         }
 
         showList(hashMapResult);
-        sa.progDialog.dismiss();
-
+        if (sa.flag1 == true) {
+            sa.progDialog.dismiss();
+            sa.flag1 = false;
+        }
+        if (sa2.flag2 == true) {
+            sa2.progDialog2.dismiss();
+            sa2.flag2 = false;
+        }
         bt_request = (Button) findViewById(R.id.bt_request);
         bt_request.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                cfrmDialog();
+                if (rowLength == 0) {
+                    final AlertDialog.Builder alertDlg = new AlertDialog.Builder(CartActivity.this);
+                    alertDlg.setIcon(R.mipmap.ic_launcher);
+                    alertDlg.setMessage("목록이 비었습니다.");
+                    alertDlg.setPositiveButton("확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int whichButton) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = alertDlg.create();
+                    alert.setTitle("깃털쇼핑_1조");
+                    alert.show();
+                } else {
+                    cfrmDialog();
+                }
             }
         });
 
@@ -181,13 +206,12 @@ public class CartActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
-		
-		for(int i = 0 ; i < rowLength; i++)
-        {
+
+        for (int i = 0; i < rowLength; i++) {
             adapter.price_sum = adapter.price_sum + (data_intprice.get(i) * Integer.valueOf(data_prcnt.get(i)));
             Log.d("minhwan", "price_sum의 값 : " + adapter.price_sum);
-            Log.d("minhwan", "data_intprice.get(i)의 값 : "+ data_intprice.get(i));
-            Log.d("minhwan", "Integer.valueOf(CartActivity.data_prcnt.get(i))의 값 : "+ Integer.valueOf(data_prcnt.get(i)));
+            Log.d("minhwan", "data_intprice.get(i)의 값 : " + data_intprice.get(i));
+            Log.d("minhwan", "Integer.valueOf(CartActivity.data_prcnt.get(i))의 값 : " + Integer.valueOf(data_prcnt.get(i)));
         }
 
         //Log.d(HWC, "data_price의 값 : " + data_price);
@@ -372,8 +396,8 @@ public class CartActivity extends Activity {
             result[i] = new HashMap<String, String>();
 
             if (ListView_custom.data_checked.get(i) == true) {
-                result[i] = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId);
-                count ++;
+                result[i] = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId, data_prcnt.get(i));
+                count++;
             }
         }
         rowLength -= count;

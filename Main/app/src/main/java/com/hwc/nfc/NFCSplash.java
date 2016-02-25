@@ -21,7 +21,6 @@ import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
 import com.hwc.dao.nfc.NFCDao;
 import com.hwc.main.R;
-import com.hwc.tagging.TaggingActivity;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -165,7 +164,7 @@ public class NFCSplash extends Activity {
                         formatable.connect();
                         formatable.format(message);
                         Toast.makeText(getApplicationContext(),
-                                "tag is formatted successfully",
+                                "태그가 성공적으로 정렬되었습니다.",
                                 Toast.LENGTH_SHORT).show();
                     } catch(IOException ex) {
                         ex.printStackTrace();
@@ -196,7 +195,7 @@ public class NFCSplash extends Activity {
 
                 byte[] tagId = tag.getId();
                 // 이 부분 주석 안하면 tag read시 에러남
-                Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "사용되지 않은 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
                 //tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
 //                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
@@ -238,7 +237,7 @@ public class NFCSplash extends Activity {
 
                 byte[] tagId = tag.getId();
                 // 이 부분 주석 안하면 tag read시 에러남
-                Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), byteArrayToHex(tagId), Toast.LENGTH_SHORT).show();
 
                 strTagId = byteArrayToHex(tagId);
 
@@ -257,7 +256,7 @@ public class NFCSplash extends Activity {
 
                 // 브랜드 가져온다
                 if(boolIsUsed == true) { // used가 1이면
-                    Toast.makeText(getApplicationContext(), "used tag", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "사용된 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
                     boolIsUsed = true;
                     boolIsEmptyChip = false;
                     putDataIntoBundle(intent);
@@ -265,11 +264,12 @@ public class NFCSplash extends Activity {
                     //execForUsedTagThread();
                 }
                 else { // used가 0이면
-                    Toast.makeText(getApplicationContext(), "unused tag", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "사용되지 않은 NFC 태그입니다.", Toast.LENGTH_SHORT).show();
                     boolIsUsed = false;
                     boolIsEmptyChip = false;
                     putDataIntoBundle(intent);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     //execForUnusedTagThread();
                 }
                 //execInitThread();

@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hwc.main.R;
@@ -211,6 +210,7 @@ public class ListView_custom extends BaseAdapter {
                     if (flag[position] == true) {
                         Log.d(HWC, "[" + position + "번째 포지션의 + 버튼 누름");
                         count[position]++;
+                        CartActivity.data_prcnt.set(position, Integer.toString(count[position]));
                         temp_sum[position] += ca.data_intprice.get(position);
                         price_sum += ca.data_intprice.get(position);
                         CartActivity.setTextPrice(price_sum);
@@ -230,6 +230,7 @@ public class ListView_custom extends BaseAdapter {
                         if (temp_sum[position] > 0) {
                             Log.d(HWC, "[" + position + "번째 포지션의 - 체크 누름");
                             count[position]--;
+                            CartActivity.data_prcnt.set(position, Integer.toString(count[position]));
                             temp_sum[position] -= ca.data_intprice.get(position);
                             price_sum -= ca.data_intprice.get(position);
                             CartActivity.setTextPrice(price_sum);

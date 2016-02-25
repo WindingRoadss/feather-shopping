@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.hwc.dao.paid.PaidDao;
 import com.hwc.main.R;
 import com.hwc.main.SelectActivity;
+import com.hwc.main.SelectActivity_customer;
 import com.hwc.shared.LoginSession;
 
 import org.apache.http.client.ClientProtocolException;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 public class PaidActivity extends Activity {
     public PaidListView_custom adapter;
     public SelectActivity sa = new SelectActivity();
+    public SelectActivity_customer sa2 = new SelectActivity_customer();
     public String myJSON;
 
     public static final String HWC = "HWC";
@@ -109,8 +111,14 @@ public class PaidActivity extends Activity {
         }
 
         showList(hashMapResult);
-        sa.progDialog.dismiss();
-
+        if (sa.flag1 == true) {
+            sa.progDialog.dismiss();
+            sa.flag1 = false;
+        }
+        if (sa2.flag2 == true) {
+            sa2.progDialog2.dismiss();
+            sa2.flag2 = false;
+        }
         bt_bring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +171,7 @@ public class PaidActivity extends Activity {
     }
 
     public void showList(HashMap<String, String>[] hashMapResult) {
-        if(hashMapResult != null)
+        if (hashMapResult != null)
             rowLength = Integer.valueOf(hashMapResult[0].get("resultNum"));
 
 //        try {
@@ -177,25 +185,25 @@ public class PaidActivity extends Activity {
 
         //*JSON 언어*//*
         //for (int i = 0; i < cart.length(); i++) {
-     try {
-        for (int i = 0; i < rowLength; i++) {
-            //JSONObject c = paid.getJSONObject(i);
-            data_name.add(hashMapResult[i].get(TAG_NAME));
-            data_size.add(hashMapResult[i].get(TAG_SIZE));
-            data_color.add(hashMapResult[i].get(TAG_COLOR));
-            data_brand.add(hashMapResult[i].get(TAG_BRAND));
-            data_image.add(hashMapResult[i].get(TAG_IMAGE));
-            data_price.add(hashMapResult[i].get(TAG_PRICE));
-            data_snum.add(hashMapResult[i].get(TAG_SNUM));
-            data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
-            data_prcnt.add(hashMapResult[i].get(TAG_PRCNT));
+        try {
+            for (int i = 0; i < rowLength; i++) {
+                //JSONObject c = paid.getJSONObject(i);
+                data_name.add(hashMapResult[i].get(TAG_NAME));
+                data_size.add(hashMapResult[i].get(TAG_SIZE));
+                data_color.add(hashMapResult[i].get(TAG_COLOR));
+                data_brand.add(hashMapResult[i].get(TAG_BRAND));
+                data_image.add(hashMapResult[i].get(TAG_IMAGE));
+                data_price.add(hashMapResult[i].get(TAG_PRICE));
+                data_snum.add(hashMapResult[i].get(TAG_SNUM));
+                data_brdel.add(hashMapResult[i].get(TAG_BRDEL));
+                data_prcnt.add(hashMapResult[i].get(TAG_PRCNT));
 
-            Log.d("showList i", Integer.toString(i));
-            Log.d("showList", hashMapResult[i].get(TAG_PRICE));
+                Log.d("showList i", Integer.toString(i));
+                Log.d("showList", hashMapResult[i].get(TAG_PRICE));
+            }
+        } catch (Exception e) {
+            Toast.makeText(PaidActivity.this, "등록된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
-     }catch(Exception e){
-         Toast.makeText(PaidActivity.this, "등록된데이터가 없습니다.", Toast.LENGTH_SHORT).show();
-     }
         Log.d(HWC, "data_price의 값 : " + data_price);
 
         Log.d(HWC, "snum의 값 : " + data_snum);
@@ -310,9 +318,6 @@ public class PaidActivity extends Activity {
                                         int whichButton) {
                         // 이벤트 실행
                         executeBringThead();
-                        Intent intent = new Intent(getBaseContext(), PaidActivity.class);
-                        startActivity(intent);
-                        finish();
                     }
                 });
         AlertDialog alert = alertDlg.create();
@@ -339,9 +344,6 @@ public class PaidActivity extends Activity {
                                         int whichButton) {
                         // 이벤트 실행
                         executeDeliveryThead();
-                        Intent intent = new Intent(getBaseContext(), PaidActivity.class);
-                        startActivity(intent);
-                        finish();
                     }
                 });
         AlertDialog alert = alertDlg.create();
@@ -361,12 +363,11 @@ public class PaidActivity extends Activity {
                 }
                 return null;
             }
-
             @Override
             protected void onPostExecute(String result) {
-                Intent intent = new Intent(getBaseContext(), PaidActivity.class);
-                startActivity(intent);
                 finish();
+                Intent intent = new Intent(PaidActivity.this, PaidActivity.class);
+                startActivity(intent);
             }
         }
         TheadTest theadTest = new TheadTest();
@@ -385,12 +386,11 @@ public class PaidActivity extends Activity {
                 }
                 return null;
             }
-
             @Override
             protected void onPostExecute(String result) {
-                Intent intent = new Intent(getBaseContext(), PaidActivity.class);
-                startActivity(intent);
                 finish();
+                Intent intent = new Intent(PaidActivity.this, PaidActivity.class);
+                startActivity(intent);
             }
         }
         TheadTest theadTest = new TheadTest();
@@ -401,10 +401,10 @@ public class PaidActivity extends Activity {
         HashMap<String, String>[] result = new HashMap[rowLength];
         int count = 0;
         //boolean queryResult = false;
-        for (int i = 0; i< rowLength; i++){
+        for (int i = 0; i < rowLength; i++) {
             result[i] = new HashMap<String, String>();
             //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if(PaidListView_custom.data_checked.get(i) == true) {
+            if (PaidListView_custom.data_checked.get(i) == true) {
                 result[i] = PaidDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i), userId, data_prcnt.get(i));
                 count++;
             }
@@ -416,10 +416,10 @@ public class PaidActivity extends Activity {
         HashMap<String, String>[] result = new HashMap[rowLength];
         int count = 0;
         //boolean queryResult = false;
-        for (int i = 0; i< rowLength; i++){
+        for (int i = 0; i < rowLength; i++) {
             result[i] = new HashMap<String, String>();
             //HashMap<String, String>[] result = CartDao.insertProductPaying(data_snum.get(i), data_size.get(i), data_color.get(i));
-            if(PaidListView_custom.data_checked.get(i) == true) {
+            if (PaidListView_custom.data_checked.get(i) == true) {
                 result[i] = PaidDao.Bring(data_snum.get(i), data_size.get(i), data_color.get(i), userId, data_prcnt.get(i));
                 count++;
             }
@@ -440,7 +440,7 @@ public class PaidActivity extends Activity {
                 //HashMap<String, String>[] result = nfcDao.selectProductName(selectedBrand);
                 hashMapResult = PaidDao.selectProductsInCart(userId);
 
-                if(hashMapResult != null) {
+                if (hashMapResult != null) {
 
                     for (HashMap<String, String> hashMap : hashMapResult) {
                         if (hashMap.get("status") == "OK") {
