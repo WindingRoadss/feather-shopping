@@ -368,7 +368,6 @@ public class NFCActivity extends Activity {
         btnSave = (Button)findViewById(R.id.btnSave);
         btnShowSelectedPrImage = (Button)findViewById(R.id.btnShowSelectedPrImage);
 
-
         ivSelectedPrImage = (ImageView)findViewById(R.id.ivSelectedPrImage) ;
 
         spinBrand.setOnItemSelectedListener(onItemSelectedListenerBrand);
@@ -382,6 +381,7 @@ public class NFCActivity extends Activity {
 
         // Bundle로 넘겨받은 값 Set
         boolIsUsed = boolIsUsedFromBundle;
+        tvTagId.setText(strTagIdFromBundle);
 
         loginSession = new LoginSession(getApplicationContext());
         infoListFormPref = loginSession.getPreferencesResultHashMap();
@@ -716,7 +716,7 @@ public class NFCActivity extends Activity {
                     handler.post(new Runnable() {
                         public void run() {
                             spinColor.setAdapter(adapterColor);
-                            if(selectedColor != null) {
+                            if (selectedColor != null) {
                                 if (!selectedColor.equals("")) {
                                     int spinPosition = adapterColor.getPosition(selectedColor);
                                     spinColor.setSelection(spinPosition);
@@ -801,11 +801,12 @@ public class NFCActivity extends Activity {
                 String tagId = strTagIdFromBundle; // tagId 가져온다
                 String extName = null, noSpacePrName = null;
 
-
                 if(strSelecteProductImagName != null)
                     extName = extractExtName(strSelecteProductImagName);
                 if(strSelecteProductImagName != null)
                     noSpacePrName = convertStrNoSpace(selectedProductName);
+
+                //printToastInThread(strImageEncoded);
 
                 final HashMap<String, String> result = nfcDao.updateProductInfo(tagId,
                         selectedBrand, noSpacePrName, selectedSerial, selectedSize, selectedColor, strImageEncoded, extName);

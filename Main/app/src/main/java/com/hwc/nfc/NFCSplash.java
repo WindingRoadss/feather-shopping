@@ -36,7 +36,7 @@ public class NFCSplash extends Activity {
 
     // 입력할 url, aar
     private String url = "url";
-    private String aar = "aar";
+    private String aar = "com.lotte.main";
 
     // used 정보와 tagid 정보를 담을 bundle
     private Bundle bundle;
@@ -131,7 +131,7 @@ public class NFCSplash extends Activity {
             // 1은 AAR
             // textview에 어플리케이션 이름이 들어간 내용이 NdefRecord로 들어간다.
             // record[1] = NdefRecord.createApplicationRecord(((TextView) findViewById(R.id.writeAAR)).getText().toString());
-            record[1] = NdefRecord.createApplicationRecord(aar);
+            record[1] = NdefRecord.createApplicationRecord(s_aar);
 
             // 만들어진 NdefRecord를 NdefMessage로 포장한다.
             NdefMessage message = new NdefMessage(record);
@@ -174,23 +174,22 @@ public class NFCSplash extends Activity {
                 ndef.connect(); // ndef 연결
 
                 // 쓰기가 불가능하면
-//                if (!ndef.isWritable()) {
-//                    Toast.makeText(getApplicationContext(), "Error: tag not writable",
-//                            Toast.LENGTH_SHORT).show();
-//                    return false;
-//                }
+                if (!ndef.isWritable()) {
+                    Toast.makeText(getApplicationContext(), "Error: tag not writable",
+                            Toast.LENGTH_SHORT).show();
+                    //return false;
+                }
 
                 // Tag에 들어간 Ndef메시지의 크기가 허용된 최대 크기보다 크면
-//                if (ndef.getMaxSize() < size) {
-//                    Toast.makeText(getApplicationContext(),
-//                            "Error: tag too small",
-//                            Toast.LENGTH_SHORT).show();
-//                    return false;
-//                }
+                if (ndef.getMaxSize() < size) {
+                    Toast.makeText(getApplicationContext(),
+                            "Error: tag too small",
+                            Toast.LENGTH_SHORT).show();
+                    //return false;
+                }
 
                 //NdefMessage를 얻어온 Tag에 입력
-                //ndef.writeNdefMessage(message);
-
+                ndef.writeNdefMessage(message);
                 //Toast.makeText(getApplicationContext(), "쓰기 성공!", Toast.LENGTH_SHORT).show();
 
                 byte[] tagId = tag.getId();
@@ -204,6 +203,7 @@ public class NFCSplash extends Activity {
                 //threadTest(); // test 중
 
                 strTagId = byteArrayToHex(tagId);
+                //Toast.makeText(getApplicationContext(), "새로운 Chip 입니다 : " + strTagId, Toast.LENGTH_SHORT).show();
                 boolIsUsed = false;
                 boolIsEmptyChip = true;
 
@@ -232,8 +232,23 @@ public class NFCSplash extends Activity {
 
                 ndef.connect();
 
+                // 쓰기가 불가능하면
+                if (!ndef.isWritable()) {
+                    Toast.makeText(getApplicationContext(), "Error: tag not writable",
+                            Toast.LENGTH_SHORT).show();
+                    //return false;
+                }
+
+                // Tag에 들어간 Ndef메시지의 크기가 허용된 최대 크기보다 크면
+                if (ndef.getMaxSize() < size) {
+                    Toast.makeText(getApplicationContext(),
+                            "Error: tag too small",
+                            Toast.LENGTH_SHORT).show();
+                    //return false;
+                }
+
                 //NdefMessage를 얻어온 Tag에 입력
-                //ndef.writeNdefMessage(message);
+                ndef.writeNdefMessage(message);
 
                 byte[] tagId = tag.getId();
                 // 이 부분 주석 안하면 tag read시 에러남
@@ -244,6 +259,7 @@ public class NFCSplash extends Activity {
                 //tvTagId.setText(byteArrayToHex(tagId)); // tvTagId 세팅
 //                Toast.makeText(getApplicationContext(), tvTagId.getText().toString(), Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(), "쓰기 성공!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "사용되었던 Chip 입니다 : " + strTagId, Toast.LENGTH_SHORT).show();
 
                 // 최초일 때만 InsertTag
 

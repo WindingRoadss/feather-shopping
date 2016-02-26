@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.hwc.main"
+        applicationId "com.lotte.main"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
